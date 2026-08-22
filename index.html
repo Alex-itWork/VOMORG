@@ -11,32 +11,35 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:system-ui,-apple-sy
 canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1}
 .ui{position:fixed;z-index:10;pointer-events:none}
 .ui>*{pointer-events:auto}
-.top{top:0;left:0;right:0;padding:8px;background:rgba(0,0,0,0.7);backdrop-filter:blur(10px);display:flex;justify-content:space-between;align-items:center;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.1)}
-.stat{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.05);padding:4px 8px;border-radius:8px}
+.top{top:0;left:0;right:0;padding:10px;background:rgba(0,0,0,0.8);backdrop-filter:blur(15px);display:flex;justify-content:space-around;align-items:center;font-size:13px;border-bottom:2px solid rgba(0,245,255,0.3);box-shadow:0 0 30px rgba(0,245,255,0.2)}
+.stat{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.08);padding:6px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.15)}
 .stage{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
-.stage-name{font-size:24px;font-weight:900;background:linear-gradient(90deg,#00f5ff,#b026ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px;text-shadow:0 0 30px rgba(0,245,255,0.5)}
-.speech{font-size:14px;opacity:0.9;max-width:300px;margin:0 auto;padding:10px;background:rgba(0,0,0,0.5);border-radius:12px;border:1px solid rgba(255,255,255,0.2);backdrop-filter:blur(10px);min-height:40px}
-.bottom{bottom:0;left:0;right:0;padding:15px;display:flex;flex-direction:column;align-items:center;gap:10px}
-.tap-btn{width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,#00f5ff,#b026ff);border:3px solid rgba(255,255,255,0.3);color:#fff;font-size:16px;font-weight:900;cursor:pointer;box-shadow:0 0 50px rgba(0,245,255,0.6),inset 0 0 30px rgba(255,255,255,0.2);transition:transform 0.1s;animation:pulse 2s ease-in-out infinite}
+.stage-name{font-size:28px;font-weight:900;background:linear-gradient(90deg,#00f5ff,#b026ff,#ff006e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:10px;text-shadow:0 0 40px rgba(0,245,255,0.6);letter-spacing:1px}
+.speech{font-size:15px;opacity:0.95;max-width:320px;margin:0 auto;padding:12px 16px;background:rgba(0,0,0,0.6);border-radius:15px;border:2px solid rgba(0,245,255,0.4);backdrop-filter:blur(15px);min-height:50px;box-shadow:0 0 25px rgba(0,245,255,0.3)}
+.bottom{bottom:0;left:0;right:0;padding:20px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.tap-btn{width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,#00f5ff,#b026ff);border:4px solid rgba(255,255,255,0.4);color:#fff;font-size:18px;font-weight:900;cursor:pointer;box-shadow:0 0 60px rgba(0,245,255,0.7),inset 0 0 40px rgba(255,255,255,0.3);transition:transform 0.1s;animation:pulse 2s ease-in-out infinite;letter-spacing:2px}
 .tap-btn:active{transform:scale(0.9);animation:none}
-@keyframes pulse{0%,100%{box-shadow:0 0 50px rgba(0,245,255,0.6)}50%{box-shadow:0 0 80px rgba(176,38,255,0.8)}}
-.progress{width:100%;max-width:400px;height:8px;background:rgba(255,255,255,0.1);border-radius:4px;overflow:hidden}
-.progress-fill{height:100%;background:linear-gradient(90deg,#00f5ff,#b026ff);transition:width 0.3s;box-shadow:0 0 10px #00f5ff}
-.actions{display:flex;gap:8px}
-.action-btn{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;padding:8px 16px;border-radius:10px;font-size:12px;cursor:pointer;backdrop-filter:blur(10px);transition:all 0.2s}
-.action-btn:hover{background:rgba(255,255,255,0.2);transform:translateY(-2px)}
-.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);backdrop-filter:blur(20px);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+@keyframes pulse{0%,100%{box-shadow:0 0 60px rgba(0,245,255,0.7)}50%{box-shadow:0 0 100px rgba(176,38,255,0.9)}}
+.progress{width:100%;max-width:450px;height:10px;background:rgba(255,255,255,0.1);border-radius:5px;overflow:hidden;border:1px solid rgba(255,255,255,0.2)}
+.progress-fill{height:100%;background:linear-gradient(90deg,#00f5ff,#b026ff,#ff006e);transition:width 0.3s;box-shadow:0 0 15px #00f5ff}
+.actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.action-btn{background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.25);color:#fff;padding:10px 18px;border-radius:12px;font-size:13px;cursor:pointer;backdrop-filter:blur(15px);transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:80px}
+.action-btn:hover{background:rgba(255,255,255,0.2);transform:translateY(-3px);box-shadow:0 5px 20px rgba(0,245,255,0.4)}
+.action-btn .icon{font-size:24px}
+.action-btn .label{font-size:11px;opacity:0.9}
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);backdrop-filter:blur(25px);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
 .modal.show{display:flex}
-.modal-content{background:linear-gradient(135deg,#0f0c29,#302b63);border:2px solid rgba(255,255,255,0.2);padding:30px;border-radius:20px;max-width:400px;width:100%;text-align:center;box-shadow:0 0 60px rgba(0,245,255,0.3)}
-.modal-content h2{background:linear-gradient(90deg,#00f5ff,#b026ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:15px;font-size:24px}
-.modal-content p{margin-bottom:20px;line-height:1.6;opacity:0.9}
-.modal-btn{background:linear-gradient(135deg,#00f5ff,#b026ff);color:#fff;border:none;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;margin:5px;transition:all 0.3s;box-shadow:0 0 20px rgba(0,245,255,0.4)}
-.modal-btn:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(0,245,255,0.6)}
-.notification{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.9);border:1px solid rgba(0,245,255,0.5);padding:12px 24px;border-radius:15px;opacity:0;transition:all 0.3s;pointer-events:none;z-index:200;font-size:13px;backdrop-filter:blur(10px);box-shadow:0 0 30px rgba(0,245,255,0.4)}
-.notification.show{opacity:1;top:90px}
-.settings-btn{position:fixed;top:8px;right:8px;width:36px;height:36px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:50%;color:#fff;font-size:18px;cursor:pointer;z-index:50;backdrop-filter:blur(10px);transition:all 0.3s}
-.settings-btn:hover{transform:rotate(180deg);background:rgba(255,255,255,0.2)}
-@media(min-width:768px){.tap-btn{width:150px;height:150px;font-size:20px}.stage-name{font-size:32px}.speech{font-size:16px;max-width:500px}}
+.modal-content{background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);border:2px solid rgba(0,245,255,0.4);padding:30px;border-radius:25px;max-width:450px;width:100%;text-align:center;box-shadow:0 0 80px rgba(0,245,255,0.4);max-height:90vh;overflow-y:auto}
+.modal-content h2{background:linear-gradient(90deg,#00f5ff,#b026ff,#ff006e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:20px;font-size:26px;font-weight:900}
+.modal-content p{margin-bottom:20px;line-height:1.6;opacity:0.95}
+.modal-btn{background:linear-gradient(135deg,#00f5ff,#b026ff);color:#fff;border:none;padding:14px 28px;border-radius:15px;font-size:15px;font-weight:700;cursor:pointer;margin:6px;transition:all 0.3s;box-shadow:0 0 25px rgba(0,245,255,0.5)}
+.modal-btn:hover{transform:translateY(-3px);box-shadow:0 0 40px rgba(0,245,255,0.7)}
+.modal-btn.share{background:linear-gradient(135deg,#39ff14,#00f5ff)}
+.notification{position:fixed;top:90px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.95);border:2px solid rgba(0,245,255,0.6);padding:14px 28px;border-radius:20px;opacity:0;transition:all 0.3s;pointer-events:none;z-index:200;font-size:14px;backdrop-filter:blur(15px);box-shadow:0 0 40px rgba(0,245,255,0.5);font-weight:600}
+.notification.show{opacity:1;top:100px}
+.settings-btn{position:fixed;top:10px;right:10px;width:40px;height:40px;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.3);border-radius:50%;color:#fff;font-size:20px;cursor:pointer;z-index:50;backdrop-filter:blur(15px);transition:all 0.3s}
+.settings-btn:hover{transform:rotate(180deg);background:rgba(255,255,255,0.25);box-shadow:0 0 20px rgba(0,245,255,0.5)}
+@media(min-width:768px){.tap-btn{width:180px;height:180px;font-size:22px}.stage-name{font-size:36px}.speech{font-size:18px;max-width:600px}.action-btn{padding:12px 22px;min-width:100px}.action-btn .icon{font-size:28px}.action-btn .label{font-size:13px}}
 </style>
 </head>
 <body>
@@ -45,7 +48,7 @@ canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1}
 <div class="ui top">
 <div class="stat">⚡<span id="energy">0</span></div>
 <div class="stat">🌟<span id="taps">0</span></div>
-<div class="stat">🎯<span id="stage">1</span>/10</div>
+<div class="stat">🎯<span id="stage">1</span>/30</div>
 </div>
 <div class="ui stage">
 <div class="stage-name" id="stageName">Quantum Spark</div>
@@ -55,31 +58,42 @@ canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1}
 <div class="progress"><div class="progress-fill" id="progress" style="width:0%"></div></div>
 <button class="tap-btn" onclick="tap()">TAP</button>
 <div class="actions">
-<button class="action-btn" onclick="showAd()">📺 Ad x2</button>
-<button class="action-btn" onclick="showAchievements()">🏆</button>
+<button class="action-btn" onclick="showAd()">
+<span class="icon">📺</span>
+<span class="label">Ad x2</span>
+</button>
+<button class="action-btn" onclick="showAchievements()">
+<span class="icon">🏆</span>
+<span class="label">Awards</span>
+</button>
+<button class="action-btn" onclick="shareProgress()">
+<span class="icon">📤</span>
+<span class="label">Share</span>
+</button>
 </div>
 </div>
 <div class="modal" id="achieveModal">
 <div class="modal-content">
 <h2>🏆 Achievements</h2>
 <div id="achieveList"></div>
+<button class="modal-btn share" onclick="shareAchievements()">📤 Share</button>
 <button class="modal-btn" onclick="closeModal('achieveModal')">Close</button>
 </div>
 </div>
 <div class="modal" id="settingsModal">
 <div class="modal-content">
 <h2>⚙️ Settings</h2>
-<div style="margin:15px 0">
-<label>🔊 Music</label>
+<div style="margin:18px 0">
+<label style="display:block;margin-bottom:8px">🔊 Music</label>
 <input type="range" id="musicVol" min="0" max="100" value="30" oninput="setMusic(this.value)" style="width:100%">
 </div>
-<div style="margin:15px 0">
-<label>🎵 SFX</label>
+<div style="margin:18px 0">
+<label style="display:block;margin-bottom:8px">🎵 SFX</label>
 <input type="range" id="sfxVol" min="0" max="100" value="70" oninput="setSfx(this.value)" style="width:100%">
 </div>
-<div style="margin:15px 0">
-<label>🌍 Language</label>
-<select id="langSelect" onchange="setLang(this.value)" style="padding:8px;border-radius:8px;background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.2)">
+<div style="margin:18px 0">
+<label style="display:block;margin-bottom:8px">🌍 Language</label>
+<select id="langSelect" onchange="setLang(this.value)" style="padding:10px;border-radius:10px;background:rgba(255,255,255,0.1);color:#fff;border:2px solid rgba(255,255,255,0.3);font-size:14px;width:100%">
 <option value="en">English</option>
 <option value="ru">Русский</option>
 <option value="es">Español</option>
@@ -94,35 +108,39 @@ canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1}
 <div class="notification" id="notif"></div>
 <script>
 const T={
-en:{stages:["Quantum Spark","Photon","Electron","Atom","Molecule","Cell","Being","Mind","Civilization","Universe"],speech:["Tap to create energy...","I am light...","I have charge...","I am building...","I am complex...","I am alive...","I think...","We are many...","We build...","We are everything..."],tap:"TAP",ad:"📺 Ad x2",achieve:"🏆",close:"Close",settings:"Settings",music:"Music",sfx:"SFX",language:"Language",achieved:"Achievement unlocked!"},
-ru:{stages:["Квантовая искра","Фотон","Электрон","Атом","Молекула","Клетка","Существо","Разум","Цивилизация","Вселенная"],speech:["Тапай чтобы создать энергию...","Я — свет...","У меня есть заряд...","Я строюсь...","Я сложный...","Я живой...","Я мыслю...","Нас много...","Мы строим...","Мы — всё..."],tap:"ТАП",ad:"📺 Рек x2",achieve:"🏆",close:"Закрыть",settings:"Настройки",music:"Музыка",sfx:"Звуки",language:"Язык",achieved:"Достижение открыто!"},
-es:{stages:["Chispa Cuántica","Fotón","Electrón","Átomo","Molécula","Célula","Ser","Mente","Civilización","Universo"],speech:["Toca para crear energía...","Soy luz...","Tengo carga...","Estoy construyendo...","Soy complejo...","Estoy vivo...","Pienso...","Somos muchos...","Construimos...","Somos todo..."],tap:"TOCA",ad:"📺 Anu x2",achieve:"🏆",close:"Cerrar",settings:"Ajustes",music:"Música",sfx:"Sonidos",language:"Idioma",achieved:"¡Logro desbloqueado!"},
-tr:{stages:["Kuantum Kıvılcım","Foton","Elektron","Atom","Molekül","Hücre","Varlık","Zihin","Medeniyet","Evren"],speech:["Enerji yaratmak için dokun...","Ben ışığım...","Yüküm var...","İnşa ediyorum...","Karmaşığım...","Canlıyım...","Düşünüyorum...","Çoğuz...","İnşa ediyoruz...","Her şeyiz..."],tap:"DOKUN",ad:"📺 Rek x2",achieve:"🏆",close:"Kapat",settings:"Ayarlar",music:"Müzik",sfx:"Sesler",language:"Dil",achieved:"Başarım açıldı!"},
-pt:{stages:["Faísca Quântica","Fóton","Elétron","Átomo","Molécula","Célula","Ser","Mente","Civilização","Universo"],speech:["Toque para criar energia...","Sou luz...","Tenho carga...","Estou construindo...","Sou complexo...","Estou vivo...","Eu penso...","Somos muitos...","Construímos...","Somos tudo..."],tap:"TOQUE",ad:"📺 Anú x2",achieve:"🏆",close:"Fechar",settings:"Config",music:"Música",sfx:"Sons",language:"Idioma",achieved:"Conquista desbloqueada!"},
-kk:{stages:["Кванттық ұшқын","Фотон","Электрон","Атом","Молекула","Жасуша","Тіршілік","Ақыл","Өркениет","Ғалам"],speech:["Энергия yaratү үшін bas...","Men jarıqpın...","Menimde zarjad bar...","Men qurıp jatırmın...","Men kúrdelmın...","Men tırmın...","Men oylaymın...","Biz köppız...","Biz quramyz...","Biz barmyz..."],tap:"BAS",ad:"📺 Jar x2",achieve:"🏆",close:"Jabü",settings:"Baptar",music:"Muzika",sfx:"Dıbıstar",language:"Tıl",achieved:"Jetistik ashıldı!"}
+en:{stages:["Quantum Spark","Photon","Electron","Atom","Molecule","Cell","Organism","Being","Mind","Society","Civilization","Planet","Star System","Galaxy","Cluster","Supercluster","Universe","Multiverse","Dimension","Reality","Existence","Consciousness","Infinity","Eternity","Absolute","Omega","Transcendence","Unity","All","Everything"],speech:["Tap to create energy...","I am light...","I have charge...","I am building...","I am complex...","I am alive...","I grow...","I think...","We are many...","We build...","We rule...","We are world...","We are stars...","We are galaxy...","We are cluster...","We are supercluster...","We are universe...","We are multiverse...","We transcend...","We are reality...","We exist...","We are conscious...","We are infinite...","We are eternal...","We are absolute...","We are omega...","We transcend all...","We are one...","We are all...","We are everything..."],tap:"TAP",ad:"Ad x2",achieve:"Awards",share:"Share",close:"Close",settings:"Settings",music:"Music",sfx:"SFX",language:"Language",achieved:"Evolution!",shared:"Shared!"},
+ru:{stages:["Квантовая искра","Фотон","Электрон","Атом","Молекула","Клетка","Организм","Существо","Разум","Общество","Цивилизация","Планета","Звёздная система","Галактика","Скопление","Сверхскопление","Вселенная","Мультивселенная","Измерение","Реальность","Существование","Сознание","Бесконечность","Вечность","Абсолют","Омега","Трансцендентность","Единство","Всё","Всё сущее"],speech:["Тапай чтобы создать энергию...","Я — свет...","У меня есть заряд...","Я строюсь...","Я сложный...","Я живой...","Я расту...","Я мыслю...","Нас много...","Мы строим...","Мы правим...","Мы — мир...","Мы — звёзды...","Мы — галактика...","Мы — скопление...","Мы — сверхскопление...","Мы — вселенная...","Мы — мультивселенная...","Мы трансцендируем...","Мы — реальность...","Мы существуем...","Мы — сознание...","Мы — бесконечность...","Мы — вечность...","Мы — абсолют...","Мы — омега...","Мы трансцендентны...","Мы — едины...","Мы — всё...","Мы — всё сущее..."],tap:"ТАП",ad:"Рек x2",achieve:"Награды",share:"Поделиться",close:"Закрыть",settings:"Настройки",music:"Музыка",sfx:"Звуки",language:"Язык",achieved:"Эволюция!",shared:"Поделился!"},
+es:{stages:["Chispa Cuántica","Fotón","Electrón","Átomo","Molécula","Célula","Organismo","Ser","Mente","Sociedad","Civilización","Planeta","Sistema Estelar","Galaxia","Cúmulo","Supercúmulo","Universo","Multiverso","Dimensión","Realidad","Existencia","Conciencia","Infinito","Eternidad","Absoluto","Omega","Trascendencia","Unidad","Todo","Todo Existente"],speech:["Toca para crear energía...","Soy luz...","Tengo carga...","Estoy construyendo...","Soy complejo...","Estoy vivo...","Crezco...","Pienso...","Somos muchos...","Construimos...","Gobernamos...","Somos mundo...","Somos estrellas...","Somos galaxia...","Somos cúmulo...","Somos supercúmulo...","Somos universo...","Somos multiverso...","Trascendemos...","Somos realidad...","Existimos...","Somos conciencia...","Somos infinito...","Somos eternidad...","Somos absoluto...","Somos omega...","Somos trascendentes...","Somos uno...","Somos todo...","Somos todo existente..."],tap:"TOCA",ad:"Anu x2",achieve:"Logros",share:"Compartir",close:"Cerrar",settings:"Ajustes",music:"Música",sfx:"Sonidos",language:"Idioma",achieved:"¡Evolución!",shared:"¡Compartido!"},
+tr:{stages:["Kuantum Kıvılcım","Foton","Elektron","Atom","Molekül","Hücre","Organizma","Varlık","Zihin","Toplum","Medeniyet","Gezegen","Yıldız Sistemi","Galaksi","Küme","Süper Küme","Evren","Çoklu Evren","Boyut","Gerçeklik","Varoluş","Bilinç","Sonsuzluk","Ebediyet","Mutlak","Omega","Transandans","Birlik","Her Şey","Var Olan Her Şey"],speech:["Enerji yaratmak için dokun...","Ben ışığım...","Yüküm var...","İnşa ediyorum...","Karmaşığım...","Canlıyım...","Büyüyorum...","Düşünüyorum...","Çoğuz...","İnşa ediyoruz...","Hükmediyoruz...","Biz dünyayız...","Biz yıldızlarız...","Biz galaksiyiz...","Biz kümeyiz...","Biz süper kümeyiz...","Biz evreniz...","Biz çoklu evreniz...","Transandans ediyoruz...","Biz gerçekliğiz...","Varız...","Biz bilinçiz...","Biz sonsuzuz...","Biz ebediyiz...","Biz mutlakız...","Biz omega'yız...","Biz transandansız...","Biz biriz...","Biz her şeyiz...","Biz var olan her şeyiz..."],tap:"DOKUN",ad:"Rek x2",achieve:"Başarımlar",share:"Paylaş",close:"Kapat",settings:"Ayarlar",music:"Müzik",sfx:"Sesler",language:"Dil",achieved:"Evrim!",shared:"Paylaşıldı!"},
+pt:{stages:["Faísca Quântica","Fóton","Elétron","Átomo","Molécula","Célula","Organismo","Ser","Mente","Sociedade","Civilização","Planeta","Sistema Estelar","Galáxia","Aglomerado","Superaglomerado","Universo","Multiverso","Dimensão","Realidade","Existência","Consciência","Infinito","Eternidade","Absoluto","Ômega","Transcendência","Unidade","Tudo","Tudo Existente"],speech:["Toque para criar energia...","Sou luz...","Tenho carga...","Estou construindo...","Sou complexo...","Estou vivo...","Cresço...","Eu penso...","Somos muitos...","Construímos...","Governamos...","Somos mundo...","Somos estrelas...","Somos galáxia...","Somos aglomerado...","Somos superaglomerado...","Somos universo...","Somos multiverso...","Transcendemos...","Somos realidade...","Existimos...","Somos consciência...","Somos infinito...","Somos eternidade...","Somos absoluto...","Somos ômega...","Somos transcendentais...","Somos um...","Somos tudo...","Somos tudo existente..."],tap:"TOQUE",ad:"Anú x2",achieve:"Conquistas",share:"Compartilhar",close:"Fechar",settings:"Config",music:"Música",sfx:"Sons",language:"Idioma",achieved:"Evolução!",shared:"Compartilhado!"},
+kk:{stages:["Кванттық ұшқын","Фотон","Электрон","Атом","Молекула","Жасуша","Организм","Тіршілік","Ақыл","Қоғам","Өркениет","Ғаламшар","Жұлдыз жүйесі","Галактика","Топ","Супертоп","Ғалам","Мультиғалам","Өлшем","Шындық","Өмір","Сан","Шексіздік","Мәңгілік","Абсолют","Омега","Трансцендентті","Бірлік","Бәрі","Барлық өмір"],speech:["Энергия yaratү үшін bas...","Men jarıqpın...","Menimde zarjad bar...","Men qurıp jatırmın...","Men kúrdelmın...","Men tırmın...","Men ósıp jatırmın...","Men oylaymın...","Biz köppız...","Biz quramyz...","Biz basqaramyz...","Biz álemmız...","Biz juldyzdarıyz...","Biz galaktikamyz...","Biz topıyz...","Biz supertopıyz...","Biz álemmız...","Biz multiálemmız...","Biz transcendentpız...","Biz şındıqıyz...","Biz ómırmız...","Biz sanıyz...","Biz şeksızız...","Biz máñgılıkmız...","Biz absolútıyz...","Biz omegamyz...","Biz transcendenttııyz...","Biz bırmız...","Biz bármız...","Biz barlıq ómırmız..."],tap:"BAS",ad:"Jar x2",achieve:"Jetistikter",share:"Bólísü",close:"Jabü",settings:"Baptar",music:"Muzika",sfx:"Dıbıstar",language:"Tıl",achieved:"Evoluciya!",shared:"Bólistim!"}
 };
-const STAGES=[0,10,50,200,1000,5000,20000,100000,500000,2000000];
-const COLORS=["#00f5ff","#00ff88","#ffea00","#ff6b00","#ff006e","#b026ff","#39ff14","#00d4ff","#ff00aa","#ffffff"];
+const STAGES=[0,10,50,200,1000,5000,20000,100000,500000,2000000,10000000,50000000,200000000,1000000000,5000000000,20000000000,100000000000,500000000000,2000000000000,10000000000000,50000000000000,200000000000000,1000000000000000,5000000000000000,20000000000000000,100000000000000000,500000000000000000,2000000000000000000,10000000000000000000,50000000000000000000];
+const COLORS=["#00f5ff","#00ff88","#ffea00","#ff6b00","#ff006e","#b026ff","#39ff14","#00d4ff","#ff00aa","#ffffff","#ff3366","#66ff33","#3366ff","#ff9933","#9933ff","#33ff99","#ff3399","#3399ff","#99ff33","#ff6633","#33ff66","#6633ff","#ff33cc","#33ccff","#ccff33","#ff3333","#33ff33","#3333ff","#ff33ff","#ffffff"];
 let state={taps:0,stage:0,lang:'en',music:30,sfx:70,achievements:[]};
 let ysdk=null,player=null,audioCtx=null,musicGain=null,sfxGain=null;
 const canvas=document.getElementById('canvas');
 const ctx=canvas.getContext('2d');
 let particles=[];
+let gridOffset=0;
 function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight}
 window.addEventListener('resize',resize);
 resize();
 class Particle{
 constructor(x,y,color){
 this.x=x;this.y=y;this.color=color;
-this.vx=(Math.random()-0.5)*4;this.vy=(Math.random()-0.5)*4;
-this.life=1;this.decay=0.02;this.size=Math.random()*3+2;
+this.vx=(Math.random()-0.5)*6;this.vy=(Math.random()-0.5)*6;
+this.life=1;this.decay=0.015;this.size=Math.random()*4+2;
 }
 update(){
 this.x+=this.vx;this.y+=this.vy;this.life-=this.decay;
+this.vx*=0.98;this.vy*=0.98;
 }
 draw(){
 ctx.globalAlpha=this.life;
 ctx.fillStyle=this.color;
+ctx.shadowBlur=15;
+ctx.shadowColor=this.color;
 ctx.beginPath();
 ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
 ctx.fill();
@@ -143,7 +161,7 @@ playMusic();
 }
 function playMusic(){
 if(!audioCtx)return;
-const notes=[220,261.63,329.63,392,440];
+const notes=[220,261.63,329.63,392,440,523.25];
 let i=0;
 function play(){
 if(!audioCtx||audioCtx.state==='closed')return;
@@ -153,12 +171,12 @@ osc.type='sine';
 osc.frequency.value=notes[i%notes.length];
 const now=audioCtx.currentTime;
 gain.gain.setValueAtTime(0,now);
-gain.gain.linearRampToValueAtTime(0.1,now+0.5);
-gain.gain.linearRampToValueAtTime(0,now+3);
+gain.gain.linearRampToValueAtTime(0.08,now+0.5);
+gain.gain.linearRampToValueAtTime(0,now+4);
 osc.connect(gain);gain.connect(musicGain);
-osc.start(now);osc.stop(now+3);
+osc.start(now);osc.stop(now+4);
 i++;
-setTimeout(play,2500);
+setTimeout(play,3000);
 }
 play();
 }
@@ -166,18 +184,26 @@ function playTap(){
 if(!audioCtx||state.sfx===0)return;
 const osc=audioCtx.createOscillator();
 const gain=audioCtx.createGain();
+const lfo=audioCtx.createOscillator();
+const lfoGain=audioCtx.createGain();
 osc.type='sine';
-osc.frequency.value=800+Math.random()*400;
+osc.frequency.value=500+Math.random()*200;
+lfo.type='sine';
+lfo.frequency.value=8;
+lfoGain.gain.value=50;
+lfo.connect(lfoGain);
+lfoGain.connect(osc.frequency);
 const now=audioCtx.currentTime;
 gain.gain.setValueAtTime(0,now);
-gain.gain.linearRampToValueAtTime(0.3,now+0.02);
-gain.gain.linearRampToValueAtTime(0,now+0.1);
+gain.gain.linearRampToValueAtTime(0.25,now+0.03);
+gain.gain.exponentialRampToValueAtTime(0.001,now+0.2);
 osc.connect(gain);gain.connect(sfxGain);
-osc.start(now);osc.stop(now+0.1);
+osc.start(now);lfo.start(now);
+osc.stop(now+0.2);lfo.stop(now+0.2);
 }
 function playEvolve(){
 if(!audioCtx||state.sfx===0)return;
-const notes=[523.25,659.25,783.99,1046.50];
+const notes=[523.25,659.25,783.99,1046.50,1318.51];
 notes.forEach((f,i)=>{
 setTimeout(()=>{
 const osc=audioCtx.createOscillator();
@@ -186,12 +212,32 @@ osc.type='square';
 osc.frequency.value=f;
 const now=audioCtx.currentTime;
 gain.gain.setValueAtTime(0,now);
-gain.gain.linearRampToValueAtTime(0.2,now+0.05);
-gain.gain.linearRampToValueAtTime(0,now+0.3);
+gain.gain.linearRampToValueAtTime(0.15,now+0.05);
+gain.gain.linearRampToValueAtTime(0,now+0.4);
 osc.connect(gain);gain.connect(sfxGain);
-osc.start(now);osc.stop(now+0.3);
-},i*100);
+osc.start(now);osc.stop(now+0.4);
+},i*120);
 });
+}
+function drawGrid(){
+const color=COLORS[state.stage];
+ctx.strokeStyle=color;
+ctx.globalAlpha=0.08;
+ctx.lineWidth=1;
+const gridSize=50;
+gridOffset=(gridOffset+0.3)%gridSize;
+for(let x=-gridSize+gridOffset;x<canvas.width+gridSize;x+=gridSize){
+ctx.beginPath();
+ctx.moveTo(x,0);
+ctx.lineTo(x,canvas.height);
+ctx.stroke();
+}
+for(let y=-gridSize+gridOffset;y<canvas.height+gridSize;y+=gridSize){
+ctx.beginPath();
+ctx.moveTo(0,y);
+ctx.lineTo(canvas.width,y);
+ctx.stroke();
+}
 }
 function tap(){
 initAudio();
@@ -200,7 +246,7 @@ playTap();
 const cx=canvas.width/2;
 const cy=canvas.height/2;
 const color=COLORS[state.stage];
-for(let i=0;i<10;i++){
+for(let i=0;i<15;i++){
 particles.push(new Particle(cx,cy,color));
 }
 checkEvolution();
@@ -220,8 +266,8 @@ state.achievements.push(state.stage);
 }
 function updateUI(){
 const t=T[state.lang];
-document.getElementById('energy').textContent=state.taps;
-document.getElementById('taps').textContent=state.taps;
+document.getElementById('energy').textContent=formatNumber(state.taps);
+document.getElementById('taps').textContent=formatNumber(state.taps);
 document.getElementById('stage').textContent=state.stage+1;
 document.getElementById('stageName').textContent=t.stages[state.stage];
 document.getElementById('speech').textContent=t.speech[state.stage];
@@ -229,7 +275,15 @@ const next=STAGES[state.stage+1]||STAGES[state.stage]*2;
 const prev=STAGES[state.stage];
 const progress=((state.taps-prev)/(next-prev))*100;
 document.getElementById('progress').style.width=Math.min(100,progress)+'%';
-document.body.style.background=`radial-gradient(circle at center, ${COLORS[state.stage]}22, #000)`;
+}
+function formatNumber(n){
+if(n>=1e18)return(n/1e18).toFixed(1)+'Qi';
+if(n>=1e15)return(n/1e15).toFixed(1)+'Qa';
+if(n>=1e12)return(n/1e12).toFixed(1)+'T';
+if(n>=1e9)return(n/1e9).toFixed(1)+'B';
+if(n>=1e6)return(n/1e6).toFixed(1)+'M';
+if(n>=1e3)return(n/1e3).toFixed(1)+'K';
+return n.toString();
 }
 function showNotif(msg){
 const n=document.getElementById('notif');
@@ -242,34 +296,63 @@ if(ysdk){
 ysdk.adv.showRewardedVideo({
 callbacks:{
 onRewarded:()=>{
-state.taps+=100*(state.stage+1);
+const bonus=100*(state.stage+1);
+state.taps+=bonus;
 checkEvolution();
 updateUI();
 save();
-showNotif('+'+(100*(state.stage+1))+' ⚡');
+showNotif('+'+formatNumber(bonus)+' ⚡');
 }
 }
 });
 }else{
-state.taps+=100*(state.stage+1);
+const bonus=100*(state.stage+1);
+state.taps+=bonus;
 checkEvolution();
 updateUI();
 save();
-showNotif('+'+(100*(state.stage+1))+' ⚡');
+showNotif('+'+formatNumber(bonus)+' ⚡');
 }
 }
 function showAchievements(){
 const list=document.getElementById('achieveList');
 list.innerHTML='';
 const t=T[state.lang];
-for(let i=0;i<10;i++){
+for(let i=0;i<30;i++){
 const unlocked=state.achievements.includes(i);
 const div=document.createElement('div');
-div.style.cssText='padding:10px;margin:5px 0;background:rgba(255,255,255,0.05);border-radius:10px;opacity:'+(unlocked?1:0.3);
-div.textContent=(unlocked?'✅ ':'🔒 ')+t.stages[i];
+div.style.cssText='padding:10px;margin:5px 0;background:rgba(255,255,255,0.05);border-radius:10px;opacity:'+(unlocked?1:0.3)+';text-align:left;display:flex;align-items:center;gap:10px';
+div.innerHTML=(unlocked?'✅ ':'🔒 ')+'<span style="font-size:14px">'+t.stages[i]+'</span>';
 list.appendChild(div);
 }
 document.getElementById('achieveModal').classList.add('show');
+}
+function shareAchievements(){
+const t=T[state.lang];
+const unlocked=state.achievements.length;
+const text=`🌌 QUANTUM: AI Evolution\n🎯 ${t.stages[state.stage]}\n⚡ ${formatNumber(state.taps)} energy\n🏆 ${unlocked}/30 achievements\n\nPlay now!`;
+if(navigator.share){
+navigator.share({title:'QUANTUM',text:text}).then(()=>{
+showNotif(t.shared);
+}).catch(()=>{});
+}else{
+navigator.clipboard.writeText(text).then(()=>{
+showNotif(t.shared);
+});
+}
+}
+function shareProgress(){
+const t=T[state.lang];
+const text=`🌌 QUANTUM: AI Evolution\n🎯 ${t.stages[state.stage]}\n⚡ ${formatNumber(state.taps)} energy\n🏆 ${state.achievements.length}/30 achievements\n\nCan you evolve further?`;
+if(navigator.share){
+navigator.share({title:'QUANTUM',text:text}).then(()=>{
+showNotif(t.shared);
+}).catch(()=>{});
+}else{
+navigator.clipboard.writeText(text).then(()=>{
+showNotif(t.shared);
+});
+}
 }
 function openSettings(){document.getElementById('settingsModal').classList.add('show')}
 function closeModal(id){document.getElementById(id).classList.remove('show')}
@@ -284,23 +367,33 @@ localStorage.setItem('quantumSave',JSON.stringify(state));
 }
 }
 function animate(){
-ctx.fillStyle='rgba(0,0,0,0.1)';
+ctx.fillStyle='rgba(0,0,0,0.15)';
 ctx.fillRect(0,0,canvas.width,canvas.height);
+drawGrid();
 particles=particles.filter(p=>p.life>0);
 particles.forEach(p=>{p.update();p.draw()});
 const cx=canvas.width/2;
 const cy=canvas.height/2;
 const color=COLORS[state.stage];
-const size=20+state.stage*5;
-ctx.globalAlpha=0.8;
+const baseSize=40+state.stage*3;
+ctx.globalAlpha=0.9;
 ctx.fillStyle=color;
+ctx.shadowBlur=40;
+ctx.shadowColor=color;
 ctx.beginPath();
-ctx.arc(cx,cy,size,0,Math.PI*2);
+ctx.arc(cx,cy,baseSize,0,Math.PI*2);
 ctx.fill();
-ctx.globalAlpha=0.3;
+ctx.globalAlpha=0.4;
 ctx.fillStyle=color;
+ctx.shadowBlur=60;
 ctx.beginPath();
-ctx.arc(cx,cy,size*1.5,0,Math.PI*2);
+ctx.arc(cx,cy,baseSize*1.5,0,Math.PI*2);
+ctx.fill();
+ctx.globalAlpha=0.2;
+ctx.fillStyle=color;
+ctx.shadowBlur=80;
+ctx.beginPath();
+ctx.arc(cx,cy,baseSize*2,0,Math.PI*2);
 ctx.fill();
 requestAnimationFrame(animate);
 }

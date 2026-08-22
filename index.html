@@ -3,225 +3,327 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VOMORG: Жизнь с нуля</title>
+    <title>Life Simulator</title>
     <script src="https://yandex.ru/games/sdk/v2"></script>
     <style>
-        :root {
-            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --card-bg: rgba(255, 255, 255, 0.95);
-            --text-color: #1a1a1a;
-            --accent: #00d4ff;
-            --accent-glow: rgba(0, 212, 255, 0.5);
-            --warning: #ff9800;
-            --danger: #ff4757;
-            --success: #2ed573;
-        }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html, body { width: 100%; height: 100%; overflow: hidden; }
+        
+        :root {
+            --neon-pink: #ff006e;
+            --neon-blue: #00f5ff;
+            --neon-purple: #b026ff;
+            --neon-green: #39ff14;
+            --neon-yellow: #ffea00;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+        
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: var(--bg-gradient);
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
             background-size: 400% 400%;
-            animation: bgShift 30s ease infinite;
-            color: var(--text-color);
+            animation: bgGradient 15s ease infinite;
+            color: white;
             display: flex;
             flex-direction: column;
             height: 100vh;
             user-select: none;
             -webkit-user-select: none;
             -webkit-tap-highlight-color: transparent;
-            transition: background 2s;
-        }
-        @keyframes bgShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            position: relative;
         }
         
-        /* Логотип VOMORG - маленький, еле виден */
-        .vomorg-logo {
+        @keyframes bgGradient {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        /* Частицы на фоне */
+        .particles {
             position: fixed;
-            top: 8px;
-            left: 8px;
-            color: rgba(255, 255, 255, 0.35);
-            font-weight: 900;
-            font-size: 9px;
-            letter-spacing: 1.5px;
-            z-index: 50;
-            font-family: 'Arial Black', sans-serif;
+            top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--neon-blue);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--neon-blue);
+            animation: floatParticle 20s linear infinite;
+            opacity: 0.6;
+        }
+        @keyframes floatParticle {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(-100px) translateX(100px); opacity: 0; }
         }
         
         /* Кнопка настроек */
         .settings-btn {
             position: fixed;
-            top: 8px;
-            right: 8px;
-            width: 32px;
-            height: 32px;
-            background: rgba(255,255,255,0.2);
-            border: none;
+            top: 12px;
+            right: 12px;
+            width: 40px;
+            height: 40px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
             border-radius: 50%;
             color: white;
-            font-size: 16px;
+            font-size: 18px;
             cursor: pointer;
-            z-index: 50;
+            z-index: 100;
             backdrop-filter: blur(10px);
+            transition: all 0.3s;
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+        }
+        .settings-btn:hover {
+            transform: rotate(180deg) scale(1.1);
+            box-shadow: 0 0 30px var(--neon-blue);
         }
         
         /* Экран загрузки */
         #loadingScreen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-gradient);
+            background: linear-gradient(135deg, #0f0c29, #302b63);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
             color: white;
             z-index: 999;
-            transition: opacity 0.3s;
+            transition: opacity 0.5s;
+            text-shadow: 0 0 20px var(--neon-blue);
         }
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top-color: var(--neon-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 20px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
         
         /* Экран создания персонажа */
         #characterCreation {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-gradient);
+            background: linear-gradient(135deg, #0f0c29, #302b63);
             display: none;
             align-items: center;
             justify-content: center;
             flex-direction: column;
             z-index: 998;
-            padding: 15px;
+            padding: 20px;
         }
         .creation-card {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            max-width: 360px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(176, 38, 255, 0.3);
+            max-width: 400px;
             width: 100%;
+            animation: cardAppear 0.6s ease-out;
         }
-        .creation-card h2 { margin-bottom: 10px; color: var(--accent); font-size: 20px; text-align: center; }
-        .creation-card p { text-align: center; margin-bottom: 15px; font-size: 14px; color: #666; }
+        @keyframes cardAppear {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .creation-card h2 {
+            margin-bottom: 15px;
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 26px;
+            text-align: center;
+            font-weight: 900;
+        }
+        .creation-card p { text-align: center; margin-bottom: 20px; font-size: 14px; opacity: 0.8; }
         .gender-options {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-bottom: 15px;
+            gap: 10px;
+            margin-bottom: 20px;
         }
         .gender-btn {
-            background: #f0f0f0;
-            border: 2px solid #ddd;
-            padding: 12px 6px;
-            border-radius: 12px;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.2);
+            padding: 15px 8px;
+            border-radius: 15px;
             cursor: pointer;
             transition: all 0.3s;
             text-align: center;
-            font-size: 12px;
-        }
-        .gender-btn.selected { border-color: var(--accent); background: rgba(0, 212, 255, 0.15); }
-        .gender-emoji { font-size: 32px; display: block; margin-bottom: 4px; }
-        .name-input {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-        .start-btn {
-            width: 100%;
-            background: linear-gradient(135deg, var(--accent), #a855f7);
+            font-size: 13px;
             color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .start-btn:disabled { background: #ccc; cursor: not-allowed; }
-
-        /* Основной интерфейс */
-        .top-bar {
-            background: rgba(255,255,255,0.95);
-            padding: 8px 12px 8px 55px;
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 6px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-            font-size: 12px;
-            font-weight: 600;
-            z-index: 10;
             backdrop-filter: blur(10px);
         }
-        .stat-item { display: flex; align-items: center; gap: 4px; }
+        .gender-btn:hover {
+            transform: translateY(-5px);
+            border-color: var(--neon-blue);
+            box-shadow: 0 10px 30px rgba(0, 245, 255, 0.3);
+        }
+        .gender-btn.selected {
+            border-color: var(--neon-pink);
+            background: rgba(255, 0, 110, 0.2);
+            box-shadow: 0 0 30px rgba(255, 0, 110, 0.5);
+        }
+        .gender-emoji { font-size: 40px; display: block; margin-bottom: 6px; }
+        .name-input {
+            width: 100%;
+            padding: 14px;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: white;
+            outline: none;
+            transition: all 0.3s;
+        }
+        .name-input:focus {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+        }
+        .name-input::placeholder { color: rgba(255,255,255,0.5); }
+        .start-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(255, 0, 110, 0.4);
+        }
+        .start-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(255, 0, 110, 0.6);
+        }
+        .start-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Верхняя панель */
+        .top-bar {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 10px 15px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            z-index: 10;
+            position: relative;
+        }
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(255,255,255,0.05);
+            padding: 6px 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
         .level-bar-container {
             grid-column: span 2;
-            background: #e0e0e0;
-            border-radius: 8px;
-            height: 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            height: 14px;
             overflow: hidden;
-            margin-top: 2px;
+            margin-top: 4px;
+            border: 1px solid rgba(255,255,255,0.2);
         }
         .level-bar-fill {
-            background: linear-gradient(90deg, var(--accent), #a855f7);
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple), var(--neon-blue));
+            background-size: 200% 100%;
             height: 100%;
             width: 0%;
             transition: width 0.4s;
-            box-shadow: 0 0 8px var(--accent-glow);
+            box-shadow: 0 0 15px var(--neon-pink);
+            animation: barShine 3s linear infinite;
+        }
+        @keyframes barShine {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
         }
         .level-text {
             grid-column: span 2;
-            font-size: 10px;
-            color: #666;
+            font-size: 11px;
+            opacity: 0.8;
             text-align: center;
+            margin-top: 2px;
         }
 
         /* Потребности */
         .needs-bar {
-            background: rgba(255,255,255,0.9);
-            padding: 6px 10px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 8px 12px;
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 5px;
+            gap: 6px;
             font-size: 10px;
-            backdrop-filter: blur(10px);
+            z-index: 10;
+            position: relative;
         }
         .need-item { text-align: center; }
         .need-bar {
-            background: #e0e0e0;
-            border-radius: 4px;
-            height: 6px;
-            margin-top: 2px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            height: 8px;
+            margin-top: 3px;
             overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.15);
         }
-        .need-fill { height: 100%; transition: width 0.3s; }
-        .need-fill.hunger { background: var(--warning); }
-        .need-fill.thirst { background: #3498db; }
-        .need-fill.energy { background: var(--success); }
-        .need-fill.hygiene { background: #9b59b6; }
-        .need-fill.fun { background: #e74c3c; }
+        .need-fill { height: 100%; transition: width 0.3s; box-shadow: 0 0 8px currentColor; }
+        .need-fill.hunger { background: linear-gradient(90deg, #ff6b00, #ffaa00); color: #ffaa00; }
+        .need-fill.thirst { background: linear-gradient(90deg, #0099ff, #00ddff); color: #00ddff; }
+        .need-fill.energy { background: linear-gradient(90deg, #00ff88, #39ff14); color: #39ff14; }
+        .need-fill.hygiene { background: linear-gradient(90deg, #b026ff, #ff00aa); color: #ff00aa; }
+        .need-fill.fun { background: linear-gradient(90deg, #ff006e, #ff00aa); color: #ff006e; }
         
-        /* Дополнительные статы */
+        /* Доп статы */
         .extra-stats {
-            background: rgba(255,255,255,0.9);
-            padding: 4px 10px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 5px 12px;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 5px;
             font-size: 10px;
-            backdrop-filter: blur(10px);
+            z-index: 10;
+            position: relative;
         }
-        .extra-stat { text-align: center; font-weight: 600; }
+        .extra-stat {
+            text-align: center;
+            font-weight: 600;
+            background: rgba(255,255,255,0.05);
+            padding: 4px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
 
         /* Центральный экран */
         .main-screen {
             flex: 1;
-            padding: 10px;
+            padding: 12px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -229,247 +331,230 @@
             overflow-y: auto;
             position: relative;
             min-height: 0;
+            z-index: 5;
         }
         .scene-visual {
             width: 100%;
-            max-width: 400px;
-            min-height: 220px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.85), rgba(240,240,240,0.85));
-            border-radius: 16px;
+            max-width: 450px;
+            min-height: 280px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 2px solid var(--glass-border);
+            border-radius: 25px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
-            border: 3px solid var(--accent);
-            box-shadow: 0 0 20px var(--accent-glow);
             position: relative;
-            padding: 15px;
+            padding: 20px;
             flex-direction: column;
-            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3), inset 0 0 40px rgba(176, 38, 255, 0.1);
         }
         
-        /* Персонаж в полный рост с анимацией */
-        .character-full {
+        /* ПЕРСОНАЖ В ПОЛНЫЙ РОСТ (SVG) */
+        .character-container {
+            width: 180px;
+            height: 260px;
             position: relative;
-            width: 100px;
-            height: 160px;
             margin: 10px 0;
+            filter: drop-shadow(0 0 20px rgba(0, 245, 255, 0.5));
+            animation: charFloat 3s ease-in-out infinite;
         }
-        .char-head {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 50px;
-            height: 50px;
-            background: #ffdbac;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            animation: headBob 2s ease-in-out infinite;
-            border: 2px solid #333;
+        @keyframes charFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
-        .char-body {
-            position: absolute;
-            top: 50px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #4a90e2, #357abd);
-            border-radius: 10px;
-            border: 2px solid #333;
+        .character-svg {
+            width: 100%;
+            height: 100%;
         }
-        .char-arm-left, .char-arm-right {
-            position: absolute;
-            top: 55px;
-            width: 15px;
-            height: 50px;
-            background: #ffdbac;
-            border-radius: 8px;
-            border: 2px solid #333;
-        }
+        /* Анимации частей тела */
         .char-arm-left {
-            left: 10px;
-            transform-origin: top center;
-            animation: armSwing 2s ease-in-out infinite;
+            transform-origin: 50px 90px;
+            animation: armSwingLeft 1.5s ease-in-out infinite;
         }
         .char-arm-right {
-            right: 10px;
-            transform-origin: top center;
-            animation: armSwing 2s ease-in-out infinite reverse;
-        }
-        .char-leg-left, .char-leg-right {
-            position: absolute;
-            top: 108px;
-            width: 18px;
-            height: 50px;
-            background: #2c3e50;
-            border-radius: 8px;
-            border: 2px solid #333;
+            transform-origin: 130px 90px;
+            animation: armSwingRight 1.5s ease-in-out infinite;
         }
         .char-leg-left {
-            left: 30px;
-            transform-origin: top center;
-            animation: legWalk 1.5s ease-in-out infinite;
+            transform-origin: 75px 180px;
+            animation: legSwingLeft 1.5s ease-in-out infinite;
         }
         .char-leg-right {
-            right: 30px;
-            transform-origin: top center;
-            animation: legWalk 1.5s ease-in-out infinite reverse;
+            transform-origin: 105px 180px;
+            animation: legSwingRight 1.5s ease-in-out infinite;
         }
-        @keyframes headBob {
-            0%, 100% { transform: translateX(-50%) translateY(0) rotate(0); }
-            50% { transform: translateX(-50%) translateY(-3px) rotate(2deg); }
+        @keyframes armSwingLeft {
+            0%, 100% { transform: rotate(-15deg); }
+            50% { transform: rotate(20deg); }
         }
-        @keyframes armSwing {
+        @keyframes armSwingRight {
+            0%, 100% { transform: rotate(15deg); }
+            50% { transform: rotate(-20deg); }
+        }
+        @keyframes legSwingLeft {
             0%, 100% { transform: rotate(-10deg); }
             50% { transform: rotate(15deg); }
         }
-        @keyframes legWalk {
-            0%, 100% { transform: rotate(-5deg); }
-            50% { transform: rotate(10deg); }
+        @keyframes legSwingRight {
+            0%, 100% { transform: rotate(10deg); }
+            50% { transform: rotate(-15deg); }
         }
         
         .character-name {
-            font-size: 14px;
+            font-size: 16px;
             font-weight: bold;
-            color: var(--accent);
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             margin-bottom: 5px;
+            text-shadow: 0 0 20px rgba(255, 0, 110, 0.5);
         }
         
         /* Пузырь с просьбой */
         .request-bubble {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            background: white;
-            border: 2px solid var(--warning);
-            border-radius: 15px;
-            padding: 6px 10px;
-            font-size: 11px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-            animation: bubbleShake 0.5s ease-in-out infinite;
-            max-width: 140px;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, var(--neon-yellow), #ff9500);
+            border-radius: 20px;
+            padding: 10px 15px;
+            font-size: 12px;
+            box-shadow: 0 0 25px rgba(255, 234, 0, 0.6);
+            animation: bubbleShake 0.6s ease-in-out infinite;
+            max-width: 160px;
             text-align: center;
-            font-weight: 600;
+            font-weight: 700;
+            color: #000;
+            z-index: 20;
         }
         @keyframes bubbleShake {
-            0%, 100% { transform: translateY(0) rotate(0); }
-            25% { transform: translateY(-3px) rotate(-2deg); }
-            75% { transform: translateY(-3px) rotate(2deg); }
+            0%, 100% { transform: translateY(0) rotate(0) scale(1); }
+            25% { transform: translateY(-4px) rotate(-3deg) scale(1.05); }
+            75% { transform: translateY(-4px) rotate(3deg) scale(1.05); }
         }
         
-        /* Пузырь с диалогом персонажа */
+        /* Пузырь с диалогом */
         .speech-bubble {
             position: absolute;
-            top: -30px;
+            top: -20px;
             left: 50%;
             transform: translateX(-50%);
             background: white;
-            border: 2px solid var(--accent);
-            border-radius: 15px;
-            padding: 6px 12px;
-            font-size: 12px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-            max-width: 180px;
+            border: 3px solid var(--neon-pink);
+            border-radius: 20px;
+            padding: 8px 15px;
+            font-size: 13px;
+            box-shadow: 0 0 25px rgba(255, 0, 110, 0.6);
+            max-width: 200px;
             text-align: center;
             opacity: 0;
             transition: opacity 0.3s;
             pointer-events: none;
+            color: #000;
+            font-weight: 600;
+            z-index: 30;
         }
-        .speech-bubble.show { opacity: 1; }
+        .speech-bubble.show { opacity: 1; animation: speechPop 0.5s ease-out; }
+        @keyframes speechPop {
+            0% { transform: translateX(-50%) scale(0); }
+            50% { transform: translateX(-50%) scale(1.2); }
+            100% { transform: translateX(-50%) scale(1); }
+        }
         .speech-bubble::after {
             content: '';
             position: absolute;
-            bottom: -8px;
+            bottom: -12px;
             left: 50%;
             transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 8px solid transparent;
-            border-right: 8px solid transparent;
-            border-top: 8px solid white;
+            width: 0; height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 12px solid white;
         }
         
         .scene-label {
-            font-size: 12px;
-            color: #555;
-            font-weight: 600;
-            margin-top: 5px;
-        }
-        
-        .event-text {
             font-size: 13px;
-            line-height: 1.4;
-            color: white;
-            background: rgba(0,0,0,0.6);
-            padding: 10px;
-            border-radius: 10px;
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-            margin: 8px 0;
+            color: rgba(255,255,255,0.9);
+            font-weight: 600;
+            margin-top: 10px;
+            background: rgba(0,0,0,0.3);
+            padding: 5px 12px;
+            border-radius: 15px;
             backdrop-filter: blur(10px);
         }
         
-        /* Тап-кнопка (появляется в садике) */
+        .event-text {
+            font-size: 14px;
+            line-height: 1.5;
+            color: white;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            padding: 12px 15px;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            margin: 10px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        /* Тап-кнопка */
         .tap-button {
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
             border: 4px solid white;
             color: white;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.5);
+            box-shadow: 0 0 40px rgba(255, 0, 110, 0.7), inset 0 0 20px rgba(255,255,255,0.2);
             transition: transform 0.1s;
             display: none;
             align-items: center;
             justify-content: center;
             flex-direction: column;
-            animation: tapShake 0.8s ease-in-out infinite;
-            margin: 5px 0;
+            animation: tapShake 1s ease-in-out infinite;
+            margin: 10px 0;
         }
         .tap-button.show { display: flex; }
         .tap-button:active {
-            transform: scale(0.9) rotate(15deg);
+            transform: scale(0.9) rotate(20deg);
             animation: none;
         }
         @keyframes tapShake {
             0%, 100% { transform: rotate(0) scale(1); }
-            20% { transform: rotate(-8deg) scale(1.05); }
-            40% { transform: rotate(8deg) scale(1.05); }
-            60% { transform: rotate(-5deg) scale(1.02); }
-            80% { transform: rotate(5deg) scale(1.02); }
+            15% { transform: rotate(-12deg) scale(1.1); }
+            30% { transform: rotate(12deg) scale(1.1); }
+            45% { transform: rotate(-8deg) scale(1.05); }
+            60% { transform: rotate(8deg) scale(1.05); }
+            75% { transform: rotate(-4deg) scale(1.02); }
         }
-        .tap-amount {
-            font-size: 10px;
-            opacity: 0.9;
-            margin-top: 3px;
-        }
+        .tap-amount { font-size: 11px; opacity: 0.9; margin-top: 3px; }
 
         /* Панель действий */
         .actions-panel {
-            background: rgba(255,255,255,0.95);
-            padding: 8px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--glass-border);
+            padding: 10px;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.15);
-            backdrop-filter: blur(10px);
+            gap: 8px;
+            z-index: 10;
+            position: relative;
         }
         .action-btn {
-            background: linear-gradient(135deg, var(--accent), #a855f7);
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
             color: white;
-            border: none;
-            padding: 10px 4px;
-            border-radius: 10px;
-            font-size: 11px;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 12px 4px;
+            border-radius: 15px;
+            font-size: 12px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
@@ -477,21 +562,37 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 2px;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+            gap: 3px;
+            box-shadow: 0 5px 20px rgba(0, 245, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+        .action-btn:hover::before { left: 100%; }
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 245, 255, 0.5);
         }
         .action-btn:active { transform: scale(0.95); }
         .action-btn span.subtext { font-size: 9px; font-weight: 400; opacity: 0.9; }
-        .action-btn:disabled { background: #ccc; cursor: not-allowed; }
+        .action-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
         .btn-next { grid-column: span 3; background: linear-gradient(135deg, #2196F3, #1976D2); }
-        .btn-ad { background: linear-gradient(135deg, var(--warning), #f57c00); color: #000; }
+        .btn-ad { background: linear-gradient(135deg, var(--neon-yellow), #ff9500); color: #000; }
         .btn-achieve { background: linear-gradient(135deg, #ffd700, #ff8c00); color: #000; }
 
         /* Модальные окна */
         .modal {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
             display: none;
             align-items: center;
             justify-content: center;
@@ -500,51 +601,71 @@
         }
         .modal.show { display: flex; }
         .modal-content {
-            background: white;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border: 2px solid var(--glass-border);
             padding: 25px;
-            border-radius: 20px;
-            max-width: 400px;
+            border-radius: 25px;
+            max-width: 420px;
             width: 100%;
             text-align: center;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            max-height: 80vh;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(176, 38, 255, 0.3);
+            max-height: 85vh;
             overflow-y: auto;
+            color: white;
         }
-        .modal-content h3 { color: var(--accent); margin-bottom: 15px; }
-        .modal-content p { margin-bottom: 15px; line-height: 1.5; }
+        .modal-content h3 {
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+        .modal-content p { margin-bottom: 15px; line-height: 1.5; opacity: 0.9; }
         .modal-btn {
-            background: linear-gradient(135deg, var(--accent), #a855f7);
+            background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 10px;
+            padding: 12px 22px;
+            border-radius: 12px;
             font-size: 14px;
             font-weight: bold;
             cursor: pointer;
             margin: 5px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 20px rgba(255, 0, 110, 0.4);
         }
+        .modal-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(255, 0, 110, 0.6); }
         
         /* Настройки */
         .settings-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px;
-            margin: 8px 0;
-            background: #f0f0f0;
-            border-radius: 8px;
+            padding: 12px;
+            margin: 10px 0;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
-        .settings-row input[type="range"] { width: 120px; }
+        .settings-row input[type="range"] { width: 120px; accent-color: var(--neon-pink); }
+        .settings-row select {
+            padding: 6px 10px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
         .toggle-switch {
             position: relative;
             width: 50px;
             height: 26px;
-            background: #ccc;
+            background: rgba(255,255,255,0.2);
             border-radius: 13px;
             cursor: pointer;
             transition: background 0.3s;
         }
-        .toggle-switch.on { background: var(--success); }
+        .toggle-switch.on { background: var(--neon-green); box-shadow: 0 0 15px var(--neon-green); }
         .toggle-switch::after {
             content: '';
             position: absolute;
@@ -558,108 +679,105 @@
         }
         .toggle-switch.on::after { left: 27px; }
         
-        /* Список достижений */
+        /* Достижения */
         .achievements-list {
-            max-height: 300px;
+            max-height: 350px;
             overflow-y: auto;
             text-align: left;
             margin: 15px 0;
         }
         .achievement-item {
-            padding: 8px;
-            margin: 5px 0;
-            background: #f0f0f0;
-            border-radius: 8px;
+            padding: 10px;
+            margin: 6px 0;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             font-size: 13px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
         }
-        .achievement-item.locked { opacity: 0.4; }
-        .achievement-emoji { font-size: 24px; }
+        .achievement-item:not(.locked):hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+        }
+        .achievement-item.locked { opacity: 0.35; }
+        .achievement-emoji { font-size: 28px; }
         
         /* Уведомления */
         .notification {
             position: fixed;
-            top: 60px;
+            top: 70px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.9);
+            background: linear-gradient(135deg, rgba(0,0,0,0.9), rgba(30,30,60,0.9));
             color: white;
-            padding: 12px 20px;
-            border-radius: 12px;
+            padding: 14px 24px;
+            border-radius: 20px;
             opacity: 0;
             transition: all 0.3s;
             pointer-events: none;
             z-index: 300;
-            font-size: 13px;
+            font-size: 14px;
             text-align: center;
             max-width: 90%;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(20px);
         }
-        .notification.show { opacity: 1; top: 70px; }
-        .notification.warning { background: rgba(255, 152, 0, 0.95); }
-        .notification.success { background: rgba(46, 213, 115, 0.95); }
-        .notification.love { background: rgba(255, 105, 180, 0.95); }
+        .notification.show { opacity: 1; top: 80px; }
+        .notification.warning { border-color: var(--neon-yellow); box-shadow: 0 0 30px rgba(255, 234, 0, 0.5); }
+        .notification.success { border-color: var(--neon-green); box-shadow: 0 0 30px rgba(57, 255, 20, 0.5); }
+        .notification.love { border-color: var(--neon-pink); box-shadow: 0 0 30px rgba(255, 0, 110, 0.5); }
         
         /* Плавающие числа */
         .floating-number {
             position: absolute;
-            font-size: 20px;
+            font-size: 24px;
             font-weight: bold;
-            color: var(--accent);
+            color: var(--neon-green);
             pointer-events: none;
             animation: floatUp 1s ease-out forwards;
-            text-shadow: 0 0 8px var(--accent-glow);
+            text-shadow: 0 0 15px var(--neon-green), 0 0 25px var(--neon-green);
             z-index: 100;
         }
         @keyframes floatUp {
-            0% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-80px); }
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-100px) scale(1.5); }
         }
         
         /* Адаптивность для ТВ */
         @media (min-width: 1200px) {
-            .top-bar { font-size: 18px; padding: 15px 20px 15px 80px; }
-            .needs-bar { font-size: 16px; padding: 12px 20px; }
-            .character-full { width: 160px; height: 260px; }
-            .char-head { width: 80px; height: 80px; font-size: 44px; }
-            .char-body { width: 100px; height: 100px; top: 80px; }
-            .char-arm-left, .char-arm-right { top: 90px; width: 25px; height: 80px; }
-            .char-arm-left { left: 15px; }
-            .char-arm-right { right: 15px; }
-            .char-leg-left, .char-leg-right { top: 178px; width: 30px; height: 80px; }
-            .char-leg-left { left: 45px; }
-            .char-leg-right { right: 45px; }
-            .scene-visual { min-height: 400px; }
-            .event-text { font-size: 20px; padding: 15px; }
-            .action-btn { font-size: 18px; padding: 20px 10px; }
-            .request-bubble { font-size: 16px; padding: 10px 15px; }
-            .tap-button { width: 160px; height: 160px; font-size: 22px; }
+            .top-bar { font-size: 20px; padding: 18px 25px; }
+            .needs-bar { font-size: 16px; padding: 14px 20px; }
+            .extra-stats { font-size: 16px; padding: 10px 20px; }
+            .character-container { width: 280px; height: 400px; }
+            .scene-visual { min-height: 500px; }
+            .event-text { font-size: 22px; padding: 20px; }
+            .action-btn { font-size: 20px; padding: 22px 10px; }
+            .request-bubble { font-size: 18px; padding: 14px 20px; }
+            .tap-button { width: 180px; height: 180px; font-size: 24px; }
+            .character-name { font-size: 24px; }
         }
         
-        /* Адаптивность для маленьких мобилок */
+        /* Маленькие мобилки */
         @media (max-width: 360px) {
-            .character-full { width: 80px; height: 130px; }
-            .char-head { width: 40px; height: 40px; font-size: 22px; }
-            .char-body { width: 50px; height: 50px; top: 40px; }
-            .char-arm-left, .char-arm-right { top: 45px; width: 12px; height: 40px; }
-            .char-arm-left { left: 8px; }
-            .char-arm-right { right: 8px; }
-            .char-leg-left, .char-leg-right { top: 88px; width: 14px; height: 40px; }
-            .char-leg-left { left: 24px; }
-            .char-leg-right { right: 24px; }
-            .action-btn { font-size: 10px; padding: 8px 2px; }
-            .gender-emoji { font-size: 24px; }
+            .character-container { width: 140px; height: 200px; }
+            .action-btn { font-size: 10px; padding: 10px 2px; }
+            .gender-emoji { font-size: 30px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="vomorg-logo">VOMORG</div>
+    <!-- Частицы на фоне -->
+    <div class="particles" id="particles"></div>
+
     <button class="settings-btn" onclick="openSettings()">⚙️</button>
 
     <div id="loadingScreen">
+        <div class="loading-spinner"></div>
         <span id="loadingText">Загрузка...</span>
     </div>
 
@@ -736,14 +854,62 @@
             <div class="speech-bubble" id="speechBubble"></div>
             <div class="character-name" id="charName">Малыш</div>
             
-            <!-- Персонаж в полный рост -->
-            <div class="character-full" id="characterFull">
-                <div class="char-head" id="charHead">😺</div>
-                <div class="char-body" id="charBody"></div>
-                <div class="char-arm-left"></div>
-                <div class="char-arm-right"></div>
-                <div class="char-leg-left"></div>
-                <div class="char-leg-right"></div>
+            <!-- ПЕРСОНАЖ В ПОЛНЫЙ РОСТ (SVG) -->
+            <div class="character-container">
+                <svg class="character-svg" viewBox="0 0 180 260" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Тень под персонажем -->
+                    <ellipse cx="90" cy="250" rx="50" ry="8" fill="rgba(0,0,0,0.3)"/>
+                    
+                    <!-- Левая нога -->
+                    <g class="char-leg-left">
+                        <rect x="68" y="180" width="18" height="60" rx="9" fill="#2c3e50" stroke="#000" stroke-width="2"/>
+                        <ellipse cx="77" cy="242" rx="12" ry="6" fill="#1a1a1a"/>
+                    </g>
+                    
+                    <!-- Правая нога -->
+                    <g class="char-leg-right">
+                        <rect x="94" y="180" width="18" height="60" rx="9" fill="#2c3e50" stroke="#000" stroke-width="2"/>
+                        <ellipse cx="103" cy="242" rx="12" ry="6" fill="#1a1a1a"/>
+                    </g>
+                    
+                    <!-- Тело -->
+                    <rect id="charBody" x="55" y="90" width="70" height="95" rx="15" fill="url(#bodyGradient)" stroke="#000" stroke-width="2"/>
+                    
+                    <!-- Левая рука -->
+                    <g class="char-arm-left">
+                        <rect x="38" y="95" width="18" height="65" rx="9" fill="#ffdbac" stroke="#000" stroke-width="2"/>
+                        <circle cx="47" cy="162" r="9" fill="#ffdbac" stroke="#000" stroke-width="2"/>
+                    </g>
+                    
+                    <!-- Правая рука -->
+                    <g class="char-arm-right">
+                        <rect x="124" y="95" width="18" height="65" rx="9" fill="#ffdbac" stroke="#000" stroke-width="2"/>
+                        <circle cx="133" cy="162" r="9" fill="#ffdbac" stroke="#000" stroke-width="2"/>
+                    </g>
+                    
+                    <!-- Голова -->
+                    <circle cx="90" cy="55" r="40" fill="#ffdbac" stroke="#000" stroke-width="2"/>
+                    
+                    <!-- Волосы (меняются с полом) -->
+                    <path id="charHair" d="M 50 50 Q 50 15 90 15 Q 130 15 130 50 Q 130 35 90 30 Q 50 35 50 50 Z" fill="#4a2c1a"/>
+                    
+                    <!-- Глаза -->
+                    <circle id="eyeLeft" cx="75" cy="55" r="5" fill="#000"/>
+                    <circle id="eyeRight" cx="105" cy="55" r="5" fill="#000"/>
+                    <circle cx="76" cy="53" r="1.5" fill="#fff"/>
+                    <circle cx="106" cy="53" r="1.5" fill="#fff"/>
+                    
+                    <!-- Рот -->
+                    <path id="charMouth" d="M 75 75 Q 90 85 105 75" stroke="#000" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    
+                    <!-- Градиенты -->
+                    <defs>
+                        <linearGradient id="bodyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#4a90e2"/>
+                            <stop offset="100%" style="stop-color:#357abd"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
             </div>
             
             <button class="tap-button" id="tapButton" onclick="game.tap()">
@@ -815,7 +981,7 @@
             </div>
             <div class="settings-row">
                 <span>🌍 <span data-i18n="language">Язык</span></span>
-                <select id="languageSelect" onchange="changeLanguage(this.value)" style="padding: 5px; border-radius: 5px;">
+                <select id="languageSelect" onchange="changeLanguage(this.value)">
                     <option value="ru">Русский</option>
                     <option value="en">English</option>
                 </select>
@@ -827,6 +993,24 @@
     <div class="notification" id="notification"></div>
 
     <script>
+        // --- СОЗДАНИЕ ЧАСТИЦ НА ФОНЕ ---
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const colors = ['#ff006e', '#00f5ff', '#b026ff', '#39ff14', '#ffea00'];
+            for (let i = 0; i < 30; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.animationDelay = Math.random() * 20 + 's';
+                p.style.animationDuration = (15 + Math.random() * 15) + 's';
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                p.style.background = color;
+                p.style.boxShadow = `0 0 10px ${color}`;
+                container.appendChild(p);
+            }
+        }
+        createParticles();
+
         // --- ПЕРЕВОДЫ ---
         const translations = {
             ru: {
@@ -845,7 +1029,7 @@
                 req_hungry2: "🍼 Я расту! Покорми!",
                 req_thirsty: "💧 Хочу пить!",
                 req_dirty: "🧷 Убери за мной!",
-                req_poop: "💩 Я покакал! Помogi!",
+                req_poop: "💩 Я покакал! Помоги!",
                 req_tired: "😴 Хочу спать!",
                 req_bored: "🎮 Поиграй со мной!",
                 req_walk: "🚶 Хочу гулять!",
@@ -880,7 +1064,8 @@
                 path_work: "💼 Сразу работать",
                 modal_rent_title: "Пора съезжать!",
                 modal_rent_text: "Нужно снять квартиру. Это стоит 30 000₽.",
-                rent_accept: "Снять", rent_later: "Позже"
+                rent_accept: "Снять", rent_later: "Позже",
+                free: "Бесплатно", no_money: "Нет денег!"
             },
             en: {
                 loading: "Loading...",
@@ -933,7 +1118,8 @@
                 path_work: "💼 Work now",
                 modal_rent_title: "Time to move out!",
                 modal_rent_text: "Need to rent a flat. It costs 30,000₽.",
-                rent_accept: "Rent", rent_later: "Later"
+                rent_accept: "Rent", rent_later: "Later",
+                free: "Free", no_money: "No money!"
             }
         };
 
@@ -948,11 +1134,10 @@
         let loveTimer = null;
         let audioCtx = null;
         let musicGain = null;
-        let musicOscillators = [];
         let settings = { musicVolume: 30, vibration: true, language: 'ru' };
         let gameStarted = false;
 
-        // --- АУДИО СИСТЕМА (спокойная музыка без лицензий) ---
+        // --- АУДИО ---
         function initAudio() {
             if (audioCtx) return;
             try {
@@ -966,27 +1151,22 @@
         
         function playAmbientMusic() {
             if (!audioCtx) return;
-            // Спокойная эмбиент-музыка: низкие синусоиды с медленной модуляцией
-            const notes = [220, 261.63, 329.63, 392]; // A, C, E, G
+            const notes = [220, 261.63, 329.63, 392];
             let noteIndex = 0;
-            
             function playNote() {
                 if (!audioCtx || audioCtx.state === 'closed') return;
                 const osc = audioCtx.createOscillator();
                 const noteGain = audioCtx.createGain();
                 osc.type = 'sine';
                 osc.frequency.value = notes[noteIndex % notes.length];
-                
                 const now = audioCtx.currentTime;
                 noteGain.gain.setValueAtTime(0, now);
                 noteGain.gain.linearRampToValueAtTime(0.15, now + 0.5);
                 noteGain.gain.linearRampToValueAtTime(0, now + 3);
-                
                 osc.connect(noteGain);
                 noteGain.connect(musicGain);
                 osc.start(now);
                 osc.stop(now + 3);
-                
                 noteIndex++;
                 setTimeout(playNote, 2500);
             }
@@ -1010,11 +1190,11 @@
         }
         
         function saveSettings() {
-            localStorage.setItem('vomorgSettings', JSON.stringify(settings));
+            localStorage.setItem('lifeSimSettings', JSON.stringify(settings));
         }
         
         function loadSettings() {
-            const s = localStorage.getItem('vomorgSettings');
+            const s = localStorage.getItem('lifeSimSettings');
             if (s) settings = { ...settings, ...JSON.parse(s) };
             document.getElementById('musicVolume').value = settings.musicVolume;
             document.getElementById('languageSelect').value = settings.language;
@@ -1066,11 +1246,11 @@
             showGameUI();
             game.saveProgress();
             updateUI();
+            updateCharacterVisual();
             startRequestSystem();
             startLoveSystem();
             unlockAchievement('ach_first_feed');
             
-            // Инициализация аудио при первом взаимодействии
             document.body.addEventListener('click', initAudio, { once: true });
             document.body.addEventListener('touchstart', initAudio, { once: true });
             
@@ -1085,7 +1265,7 @@
             document.getElementById('actionsPanel').style.display = 'grid';
         }
 
-        // --- ИНИЦИАЛИЗАЦИЯ SDK ---
+        // --- SDK ---
         YaGames.init().then(ysdkInstance => {
             ysdk = ysdkInstance;
             const detectedLang = ysdk.environment.i18n.lang;
@@ -1103,6 +1283,7 @@
                             showGameUI();
                             checkLevelUp();
                             updateUI();
+                            updateCharacterVisual();
                             startRequestSystem();
                             startLoveSystem();
                             gameStarted = true;
@@ -1112,16 +1293,16 @@
                         }
                     });
                 }).catch(() => {
-                    const saved = localStorage.getItem('vomorgSave');
+                    const saved = localStorage.getItem('lifeSimSave');
                     if (saved) {
                         gameState = { ...defaultState, ...JSON.parse(saved) };
                         showGameUI();
                         checkLevelUp();
                         updateUI();
+                        updateCharacterVisual();
                         startRequestSystem();
                         startLoveSystem();
                         gameStarted = true;
-                        // Проверка времени отсутствия
                         checkAbsence();
                     } else {
                         document.getElementById('characterCreation').style.display = 'flex';
@@ -1141,7 +1322,7 @@
         const defaultState = {
             name: '', gender: null,
             ageYears: 0, ageMonths: 0,
-            money: 0, happiness: 80, bond: 0, // bond = привязанность
+            money: 0, happiness: 80, bond: 0,
             iq: 50, strength: 10, stamina: 10, mind: 10,
             level: 1, totalEarned: 0,
             hunger: 100, thirst: 100, sleep: 100, hygiene: 100, fun: 100,
@@ -1195,42 +1376,61 @@
             { name: 'Diamond', price: 1000000 }
         ];
 
-        // --- УРОВНИ ---
         function getXpForNextLevel(lvl) {
             if (lvl >= 1000) return Infinity;
             return Math.floor(100 * Math.pow(1.08, lvl));
         }
 
-        // --- ВИЗУАЛ ПЕРСОНАЖА ---
+        // --- ОБНОВЛЕНИЕ ВИЗУАЛА ПЕРСОНАЖА ---
         function updateCharacterVisual() {
             const age = gameState.ageYears;
             const g = gameState.gender;
-            const head = document.getElementById('charHead');
+            const hair = document.getElementById('charHair');
             const body = document.getElementById('charBody');
+            const mouth = document.getElementById('charMouth');
             
-            // Лицо меняется с возрастом
-            if (age < 1) head.innerText = '😺';
-            else if (age < 3) head.innerText = '👶';
-            else if (age < 7) head.innerText = g === 'female' ? '👧' : (g === 'humanoid' ? '🤖' : '👦');
-            else if (age < 15) head.innerText = g === 'female' ? '👧' : (g === 'humanoid' ? '🤖' : '👦');
-            else if (age < 30) head.innerText = g === 'female' ? '👩' : (g === 'humanoid' ? '🤖' : '👨');
-            else if (age < 50) head.innerText = g === 'female' ? '👩‍💼' : (g === 'humanoid' ? '🤖' : '👨‍💼');
-            else if (age < 65) head.innerText = g === 'female' ? '👵' : (g === 'humanoid' ? '🤖' : '👴');
-            else head.innerText = '🧓';
-            
-            // Одежда меняется с карьерой
-            if (gameState.career === 'ceo' || gameState.career === 'director') {
-                body.style.background = 'linear-gradient(135deg, #1a1a1a, #333)';
-            } else if (gameState.career === 'manager') {
-                body.style.background = 'linear-gradient(135deg, #2c3e50, #34495e)';
-            } else if (gameState.education === 'school' || gameState.education === 'college' || gameState.education === 'university') {
-                body.style.background = 'linear-gradient(135deg, #3498db, #2980b9)';
+            // Волосы меняются с полом и возрастом
+            if (g === 'female') {
+                hair.setAttribute('d', 'M 45 55 Q 45 10 90 10 Q 135 10 135 55 Q 135 25 90 20 Q 45 25 45 55 Z');
+                hair.setAttribute('fill', '#8b4513');
+            } else if (g === 'humanoid') {
+                hair.setAttribute('d', 'M 55 40 L 60 20 L 70 30 L 80 15 L 90 30 L 100 15 L 110 30 L 120 20 L 125 40 Z');
+                hair.setAttribute('fill', '#00f5ff');
             } else {
-                body.style.background = 'linear-gradient(135deg, #4a90e2, #357abd)';
+                hair.setAttribute('d', 'M 50 50 Q 50 15 90 15 Q 130 15 130 50 Q 130 35 90 30 Q 50 35 50 50 Z');
+                hair.setAttribute('fill', '#4a2c1a');
+            }
+            
+            // Младенец — без волос
+            if (age < 1) {
+                hair.setAttribute('d', 'M 55 45 Q 90 30 125 45');
+                hair.setAttribute('fill', 'none');
+            }
+            
+            // Тело меняет цвет с карьерой/возрастом
+            let bodyColor1 = '#4a90e2', bodyColor2 = '#357abd';
+            if (age < 2) { bodyColor1 = '#ffb6c1'; bodyColor2 = '#ff69b4'; } // Младенец — розовый
+            else if (age < 7) { bodyColor1 = '#ffd700'; bodyColor2 = '#ffa500'; } // Малыш — жёлтый
+            else if (gameState.education === 'school') { bodyColor1 = '#3498db'; bodyColor2 = '#2980b9'; } // Школьная форма
+            else if (gameState.education === 'college' || gameState.education === 'university') { bodyColor1 = '#9b59b6'; bodyColor2 = '#8e44ad'; } // Студент
+            else if (gameState.career === 'worker' || gameState.career === 'specialist') { bodyColor1 = '#27ae60'; bodyColor2 = '#229954'; }
+            else if (gameState.career === 'manager') { bodyColor1 = '#2c3e50'; bodyColor2 = '#34495e'; }
+            else if (gameState.career === 'director' || gameState.career === 'ceo') { bodyColor1 = '#1a1a1a'; bodyColor2 = '#333'; }
+            
+            const grad = document.getElementById('bodyGradient');
+            grad.children[0].setAttribute('stop-color', bodyColor1);
+            grad.children[1].setAttribute('stop-color', bodyColor2);
+            
+            // Рот меняется с настроением
+            if (gameState.happiness > 70) {
+                mouth.setAttribute('d', 'M 75 75 Q 90 85 105 75'); // Улыбка
+            } else if (gameState.happiness > 40) {
+                mouth.setAttribute('d', 'M 75 78 L 105 78'); // Нейтральный
+            } else {
+                mouth.setAttribute('d', 'M 75 82 Q 90 72 105 82'); // Грусть
             }
         }
 
-        // --- ЖИЗНЕННЫЙ ЭТАП ---
         function getLifeStage() {
             const age = gameState.ageYears;
             const t = translations[currentLang];
@@ -1257,29 +1457,21 @@
             return t.scene_home;
         }
 
-        // --- СИСТЕМА ПРОСЬБ (очень частая в начале) ---
+        // --- СИСТЕМА ПРОСЬБ ---
         function startRequestSystem() {
             if (requestTimer) clearInterval(requestTimer);
-            
-            // Первые 30 секунд - просьбы каждые 2 секунды для вовлечения
             let interval = 2000;
             let elapsed = 0;
             
             requestTimer = setInterval(() => {
                 elapsed += interval;
-                
-                // Постепенно увеличиваем интервал
-                if (elapsed > 30000) interval = 5000; // после 30 сек - каждые 5 сек
-                if (elapsed > 120000) interval = 10000; // после 2 мин - каждые 10 сек
-                if (elapsed > 300000) interval = 20000; // после 5 мин - каждые 20 сек
-                
-                // Чем старше персонаж, тем реже просьбы
+                if (elapsed > 30000) interval = 5000;
+                if (elapsed > 120000) interval = 10000;
+                if (elapsed > 300000) interval = 20000;
                 if (gameState.ageYears > 5) interval *= 1.5;
                 if (gameState.ageYears > 15) interval *= 2;
                 
-                if (Math.random() < 0.7 && !activeRequest) {
-                    generateRequest();
-                }
+                if (Math.random() < 0.7 && !activeRequest) generateRequest();
             }, interval);
         }
 
@@ -1288,7 +1480,6 @@
             const age = gameState.ageYears;
             let requests = [];
             
-            // В начале игры приоритет на кормление
             if (age < 1) {
                 requests.push({ type: 'eat', text: t.req_hungry });
                 requests.push({ type: 'eat', text: t.req_hungry2 });
@@ -1302,9 +1493,7 @@
                 if (age >= 2 && age < 15 && gameState.fun < 80) requests.push({ type: 'walk', text: t.req_walk });
             }
             
-            if (requests.length === 0) {
-                requests.push({ type: 'eat', text: t.req_hungry });
-            }
+            if (requests.length === 0) requests.push({ type: 'eat', text: t.req_hungry });
             
             activeRequest = requests[Math.floor(Math.random() * requests.length)];
             const bubble = document.getElementById('requestBubble');
@@ -1323,21 +1512,15 @@
             }
         }
 
-        // --- СИСТЕМА ПРИВЯЗАННОСТИ (диалоги при долгом отсутствии) ---
+        // --- СИСТЕМА ПРИВЯЗАННОСТИ ---
         function startLoveSystem() {
             if (loveTimer) clearInterval(loveTimer);
             loveTimer = setInterval(() => {
                 const timeSinceInteraction = Date.now() - lastInteractionTime;
                 const t = translations[currentLang];
                 
-                // Если не взаимодействовали 15 секунд
-                if (timeSinceInteraction > 15000 && Math.random() < 0.3) {
-                    showSpeechBubble(t.love_you);
-                }
-                // Если 30 секунд
-                if (timeSinceInteraction > 30000 && Math.random() < 0.4) {
-                    showSpeechBubble(t.you_best);
-                }
+                if (timeSinceInteraction > 15000 && Math.random() < 0.3) showSpeechBubble(t.love_you);
+                if (timeSinceInteraction > 30000 && Math.random() < 0.4) showSpeechBubble(t.you_best);
             }, 10000);
         }
         
@@ -1346,30 +1529,29 @@
             const timeAway = Date.now() - gameState.lastSeen;
             const t = translations[currentLang];
             
-            // Если не заходили больше 1 часа
             if (timeAway > 3600000) {
                 setTimeout(() => {
                     showSpeechBubble(t.missed_you);
                     showNotification(t.missed_you, 'love');
                     vibrate([100, 50, 100]);
                 }, 1000);
-                setTimeout(() => {
-                    showSpeechBubble(t.thanks_come);
-                }, 3500);
+                setTimeout(() => showSpeechBubble(t.thanks_come), 3500);
             }
         }
         
         function showSpeechBubble(text) {
             const bubble = document.getElementById('speechBubble');
             bubble.innerText = text;
+            bubble.classList.remove('show');
+            void bubble.offsetWidth; // reflow
             bubble.classList.add('show');
             setTimeout(() => bubble.classList.remove('show'), 3000);
         }
 
-        // --- ОСНОВНАЯ ЛОГИКА ИГРЫ ---
+        // --- ОСНОВНАЯ ЛОГИКА ---
         const game = {
             tap: function() {
-                if (gameState.ageYears < 2) return; // Тап только с садика
+                if (gameState.ageYears < 2) return;
                 const earn = Math.floor(50 * (1 + gameState.level * 0.1));
                 gameState.money += earn;
                 gameState.totalEarned += earn;
@@ -1380,7 +1562,6 @@
                 lastInteractionTime = Date.now();
                 vibrate(30);
                 
-                // Плавающее число
                 const tapBtn = document.getElementById('tapButton');
                 const rect = tapBtn.getBoundingClientRect();
                 const floatNum = document.createElement('div');
@@ -1414,7 +1595,7 @@
                             showSpeechBubble(t.thanks_feed);
                             setEvent(t.thanks_feed);
                         } else {
-                            showNotification(currentLang === 'ru' ? 'Нет денег!' : 'No money!', 'warning');
+                            showNotification(t.no_money, 'warning');
                             return;
                         }
                         break;
@@ -1438,7 +1619,6 @@
                     case 'clean':
                         gameState.hygiene = Math.min(100, gameState.hygiene + 70);
                         fulfillRequest('clean');
-                        // Если была просьба "покакал" - отдельная благодарность
                         if (activeRequest && activeRequest.type === 'clean' && activeRequest.text.includes('💩')) {
                             showSpeechBubble(t.thanks_wipe);
                             showNotification(t.thanks_wipe, 'success');
@@ -1449,7 +1629,7 @@
                         break;
                     case 'play':
                         if (age >= 3 && gameState.money < 50) {
-                            showNotification(currentLang === 'ru' ? 'Нет денег!' : 'No money!', 'warning');
+                            showNotification(t.no_money, 'warning');
                             return;
                         }
                         if (age >= 3) gameState.money -= 50;
@@ -1460,7 +1640,6 @@
                         fulfillRequest('walk');
                         showSpeechBubble(t.thanks_play);
                         setEvent(t.thanks_play);
-                        // Прокачка ума через игру
                         gameState.mind = Math.min(100, gameState.mind + 1);
                         break;
                 }
@@ -1468,6 +1647,7 @@
                 gameState.totalActions++;
                 if (age < 18 && gameState.money < 0) gameState.money = 0;
                 
+                updateCharacterVisual();
                 checkLevelUp();
                 this.saveProgress();
                 updateUI();
@@ -1478,40 +1658,32 @@
                 lastInteractionTime = Date.now();
                 vibrate(20);
                 
-                // Скорость падения потребностей зависит от возраста
-                // Младенец - быстро (каждый месяц сильно падает)
-                // Взрослый - медленно
                 const ageFactor = Math.max(0.3, 1 - gameState.ageYears * 0.02);
-                
                 gameState.hunger = Math.max(0, gameState.hunger - 20 * ageFactor);
                 gameState.thirst = Math.max(0, gameState.thirst - 25 * ageFactor);
                 gameState.sleep = Math.max(0, gameState.sleep - 15 * ageFactor);
                 gameState.hygiene = Math.max(0, gameState.hygiene - 15 * ageFactor);
                 gameState.fun = Math.max(0, gameState.fun - 20 * ageFactor);
                 
-                // Переход на новый год
                 if (gameState.ageMonths >= 12) {
                     gameState.ageMonths = 0;
                     gameState.ageYears++;
                     this.onNewYear();
                 }
                 
-                // Доход от работы
                 if (gameState.career !== 'none') {
                     const salary = this.getSalary();
                     gameState.money += salary;
                     gameState.totalEarned += salary;
                 }
                 
-                // Расходы
                 if (gameState.ageYears >= 18) {
                     let expenses = 5000;
                     if (gameState.housing === 'rented') expenses += 15000;
                     if (gameState.money >= expenses) gameState.money -= expenses;
-                    else { gameState.happiness -= 10; }
+                    else gameState.happiness -= 10;
                 }
                 
-                // Покупка телефона с 10 лет
                 if (gameState.ageYears >= 10 && gameState.ageYears <= 19) {
                     const phoneIdx = gameState.ageYears - 10;
                     if (phoneIdx >= gameState.phoneModel) {
@@ -1520,20 +1692,16 @@
                             gameState.money -= phone.price;
                             gameState.phoneModel = phoneIdx + 1;
                             if (phoneIdx === 0) unlockAchievement('ach_first_phone');
-                            setEvent(currentLang === 'ru' 
-                                ? `📱 Куплен новый телефон: ${phone.name}!` 
-                                : `📱 New phone: ${phone.name}!`);
+                            setEvent(currentLang === 'ru' ? `📱 Новый телефон: ${phone.name}!` : `📱 New phone: ${phone.name}!`);
                         }
                     }
                 }
                 
-                // Уменьшение лет учебы
                 if (gameState.educationYearsLeft > 0) {
                     gameState.educationYearsLeft--;
                     if (gameState.educationYearsLeft === 0) this.onEducationEnd();
                 }
                 
-                // Автоматические этапы жизни
                 if (gameState.ageYears === 2 && gameState.education === 'none') {
                     gameState.education = 'kindergarten';
                     unlockAchievement('ach_kindergarten');
@@ -1545,15 +1713,11 @@
                     setEvent(currentLang === 'ru' ? '📚 Первый класс!' : '📚 First grade!');
                 }
                 if (gameState.ageYears === 15 && !gameState.pathChosen) this.showPathChoice();
-                if (gameState.ageYears === 18 && gameState.education === 'school') {
-                    unlockAchievement('ach_graduation');
-                }
+                if (gameState.ageYears === 18 && gameState.education === 'school') unlockAchievement('ach_graduation');
                 
-                // Проверка потребностей
-                if (gameState.hunger < 30 || gameState.thirst < 30 || gameState.hygiene < 30) {
-                    gameState.happiness -= 5;
-                }
+                if (gameState.hunger < 30 || gameState.thirst < 30 || gameState.hygiene < 30) gameState.happiness -= 5;
                 
+                updateCharacterVisual();
                 checkLevelUp();
                 this.saveProgress();
                 updateUI();
@@ -1566,7 +1730,6 @@
                     gameState.iq = Math.min(200, gameState.iq + 5);
                     gameState.mind = Math.min(100, gameState.mind + 3);
                 }
-                // Прокачка силы и выносливости с возрастом
                 gameState.strength = Math.min(100, gameState.strength + 2);
                 gameState.stamina = Math.min(100, gameState.stamina + 2);
             },
@@ -1666,11 +1829,11 @@
             shareAchievements: function() {
                 const count = gameState.achievements.length;
                 const text = currentLang === 'ru'
-                    ? `🎮 VOMORG: Жизнь с нуля\n👤 ${gameState.name}\n🎂 Возраст: ${gameState.ageYears} лет ${gameState.ageMonths} мес\n💰 Капитал: ${gameState.money.toLocaleString()} ₽\n🏆 Наград: ${count}/${achievementsList.length}\n💖 Привязанность: ${gameState.bond}%`
-                    : `🎮 VOMORG: Life from Zero\n👤 ${gameState.name}\n🎂 Age: ${gameState.ageYears}y ${gameState.ageMonths}m\n💰 Capital: ${gameState.money.toLocaleString()} ₽\n🏆 Awards: ${count}/${achievementsList.length}\n💖 Bond: ${gameState.bond}%`;
+                    ? `🎮 Life Simulator\n👤 ${gameState.name}\n🎂 Возраст: ${gameState.ageYears} лет ${gameState.ageMonths} мес\n💰 Капитал: ${gameState.money.toLocaleString()} ₽\n🏆 Наград: ${count}/${achievementsList.length}\n💖 Привязанность: ${gameState.bond}%`
+                    : `🎮 Life Simulator\n👤 ${gameState.name}\n🎂 Age: ${gameState.ageYears}y ${gameState.ageMonths}m\n💰 Capital: ${gameState.money.toLocaleString()} ₽\n🏆 Awards: ${count}/${achievementsList.length}\n💖 Bond: ${gameState.bond}%`;
                 
                 if (navigator.share) {
-                    navigator.share({ title: 'VOMORG', text: text }).catch(() => {});
+                    navigator.share({ title: 'Life Simulator', text: text }).catch(() => {});
                 } else {
                     navigator.clipboard.writeText(text).then(() => {
                         showNotification(currentLang === 'ru' ? '📋 Скопировано!' : '📋 Copied!', 'success');
@@ -1683,7 +1846,7 @@
                 if (player) {
                     player.setData(gameState);
                 } else {
-                    localStorage.setItem('vomorgSave', JSON.stringify(gameState));
+                    localStorage.setItem('lifeSimSave', JSON.stringify(gameState));
                 }
             }
         };
@@ -1708,9 +1871,7 @@
                 nextLevelXp = getXpForNextLevel(gameState.level);
             }
             
-            if (gameState.career === 'manager' && !gameState.achievements.includes('ach_promotion')) {
-                unlockAchievement('ach_promotion');
-            }
+            if (gameState.career === 'manager' && !gameState.achievements.includes('ach_promotion')) unlockAchievement('ach_promotion');
             if (gameState.money >= 1000000 && !gameState.achievements.includes('ach_millionaire')) {
                 unlockAchievement('ach_millionaire');
                 gameState.housing = 'mansion';
@@ -1730,20 +1891,10 @@
                 unlockAchievement('ach_license');
             }
             
-            // Повышения
-            if (gameState.career === 'worker' && gameState.careerYears >= 3) {
-                gameState.career = 'specialist'; gameState.careerYears = 0;
-            }
-            if (gameState.career === 'specialist' && gameState.careerYears >= 5) {
-                gameState.career = 'manager'; gameState.careerYears = 0;
-                unlockAchievement('ach_promotion');
-            }
-            if (gameState.career === 'manager' && gameState.careerYears >= 7) {
-                gameState.career = 'director'; gameState.careerYears = 0;
-            }
-            if (gameState.career === 'director' && gameState.careerYears >= 10) {
-                gameState.career = 'ceo'; gameState.careerYears = 0;
-            }
+            if (gameState.career === 'worker' && gameState.careerYears >= 3) { gameState.career = 'specialist'; gameState.careerYears = 0; }
+            if (gameState.career === 'specialist' && gameState.careerYears >= 5) { gameState.career = 'manager'; gameState.careerYears = 0; unlockAchievement('ach_promotion'); }
+            if (gameState.career === 'manager' && gameState.careerYears >= 7) { gameState.career = 'director'; gameState.careerYears = 0; }
+            if (gameState.career === 'director' && gameState.careerYears >= 10) { gameState.career = 'ceo'; gameState.careerYears = 0; }
             if (gameState.career !== 'none') gameState.careerYears++;
         }
 
@@ -1755,7 +1906,6 @@
             const locale = currentLang === 'ru' ? 'ru-RU' : 'en-US';
             const t = translations[currentLang];
             
-            // Возраст: до 1 года показываем месяцы
             const ageEl = document.getElementById('age');
             if (gameState.ageYears < 1) {
                 ageEl.innerText = `${gameState.ageMonths} ${t.months}`;
@@ -1776,17 +1926,14 @@
             const percent = Math.min(100, Math.max(0, (xpInRange / xpNeededTotal) * 100));
             document.getElementById('xpBar').style.width = percent + '%';
 
-            // Дополнительные статы
             document.getElementById('iqStat').innerText = gameState.iq;
             document.getElementById('strStat').innerText = gameState.strength;
             document.getElementById('staStat').innerText = gameState.stamina;
             document.getElementById('mindStat').innerText = gameState.mind;
 
-            updateCharacterVisual();
             document.getElementById('sceneLabel').innerText = getScene();
             document.getElementById('charName').innerText = gameState.name;
 
-            // Потребности
             document.getElementById('hungerVal').innerText = Math.floor(gameState.hunger);
             document.getElementById('hungerBar').style.width = gameState.hunger + '%';
             document.getElementById('thirstVal').innerText = Math.floor(gameState.thirst);
@@ -1798,7 +1945,6 @@
             document.getElementById('funVal').innerText = Math.floor(gameState.fun);
             document.getElementById('funBar').style.width = gameState.fun + '%';
             
-            // Тап-кнопка появляется с садика (2 года)
             const tapBtn = document.getElementById('tapButton');
             if (gameState.ageYears >= 2) {
                 tapBtn.classList.add('show');
@@ -1810,20 +1956,7 @@
             
             const age = gameState.ageYears;
             const eatCost = age < 3 ? 0 : (age < 10 ? 100 : 200);
-            document.getElementById('eatCost').innerText = eatCost === 0 
-                ? (currentLang === 'ru' ? 'Бесплатно' : 'Free') 
-                : `-${eatCost}₽`;
-                
-            // Динамический фон в зависимости от времени суток (игрового)
-            const hour = (gameState.ageMonths * 2) % 24;
-            let bg;
-            if (hour >= 6 && hour < 12) bg = 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)';
-            else if (hour >= 12 && hour < 18) bg = 'linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)';
-            else if (hour >= 18 && hour < 22) bg = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-            else bg = 'linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%)';
-            document.body.style.background = bg;
-            document.body.style.backgroundSize = '400% 400%';
-            document.body.style.animation = 'bgShift 30s ease infinite';
+            document.getElementById('eatCost').innerText = eatCost === 0 ? t.free : `-${eatCost}₽`;
         }
 
         function closeModal(id) {
@@ -1837,7 +1970,6 @@
             setTimeout(() => notif.classList.remove('show'), 2500);
         }
 
-        // Сохранение при сворачивании
         window.addEventListener('blur', () => {
             if (gameStarted) game.saveProgress();
             if (requestTimer) clearInterval(requestTimer);
@@ -1849,7 +1981,6 @@
                 startLoveSystem();
             }
         });
-        // Сохранение перед закрытием
         window.addEventListener('beforeunload', () => { if (gameStarted) game.saveProgress(); });
     </script>
 </body>

@@ -32,6 +32,7 @@
             -webkit-user-select: none;
             -webkit-tap-highlight-color: transparent;
             position: relative;
+            transition: background 1s ease;
         }
         
         @keyframes bgGradient {
@@ -39,7 +40,6 @@
             50% { background-position: 100% 50%; }
         }
         
-        /* Частицы на фоне */
         .particles {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -64,7 +64,6 @@
             100% { transform: translateY(-100px) translateX(100px); opacity: 0; }
         }
         
-        /* Кнопка настроек */
         .settings-btn {
             position: fixed;
             top: 12px;
@@ -87,7 +86,6 @@
             box-shadow: 0 0 30px var(--neon-blue);
         }
         
-        /* Экран загрузки */
         #loadingScreen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -113,7 +111,6 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
         
-        /* Экран создания персонажа */
         #characterCreation {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -216,7 +213,6 @@
         }
         .start-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* Верхняя панель */
         .top-bar {
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
@@ -269,7 +265,6 @@
             margin-top: 2px;
         }
 
-        /* Потребности */
         .needs-bar {
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
@@ -298,7 +293,6 @@
         .need-fill.hygiene { background: linear-gradient(90deg, #b026ff, #ff00aa); color: #ff00aa; }
         .need-fill.fun { background: linear-gradient(90deg, #ff006e, #ff00aa); color: #ff006e; }
         
-        /* Доп статы */
         .extra-stats {
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
@@ -320,7 +314,6 @@
             border: 1px solid rgba(255,255,255,0.1);
         }
 
-        /* Центральный экран */
         .main-screen {
             flex: 1;
             padding: 12px;
@@ -348,9 +341,9 @@
             padding: 20px;
             flex-direction: column;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3), inset 0 0 40px rgba(176, 38, 255, 0.1);
+            transition: all 0.5s;
         }
         
-        /* ПЕРСОНАЖ В ПОЛНЫЙ РОСТ (SVG) */
         .character-container {
             width: 180px;
             height: 260px;
@@ -367,7 +360,6 @@
             width: 100%;
             height: 100%;
         }
-        /* Анимации частей тела */
         .char-arm-left {
             transform-origin: 50px 90px;
             animation: armSwingLeft 1.5s ease-in-out infinite;
@@ -412,7 +404,6 @@
             text-shadow: 0 0 20px rgba(255, 0, 110, 0.5);
         }
         
-        /* Пузырь с просьбой */
         .request-bubble {
             position: absolute;
             top: 15px;
@@ -435,7 +426,6 @@
             75% { transform: translateY(-4px) rotate(3deg) scale(1.05); }
         }
         
-        /* Пузырь с диалогом */
         .speech-bubble {
             position: absolute;
             top: -20px;
@@ -501,7 +491,6 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
         
-        /* Тап-кнопка */
         .tap-button {
             width: 120px;
             height: 120px;
@@ -536,7 +525,6 @@
         }
         .tap-amount { font-size: 11px; opacity: 0.9; margin-top: 3px; }
 
-        /* Панель действий */
         .actions-panel {
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
@@ -547,6 +535,7 @@
             gap: 8px;
             z-index: 10;
             position: relative;
+            margin-top: auto;
         }
         .action-btn {
             background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
@@ -587,7 +576,6 @@
         .btn-ad { background: linear-gradient(135deg, var(--neon-yellow), #ff9500); color: #000; }
         .btn-achieve { background: linear-gradient(135deg, #ffd700, #ff8c00); color: #000; }
 
-        /* Модальные окна */
         .modal {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -637,7 +625,6 @@
         }
         .modal-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(255, 0, 110, 0.6); }
         
-        /* Настройки */
         .settings-row {
             display: flex;
             justify-content: space-between;
@@ -679,7 +666,6 @@
         }
         .toggle-switch.on::after { left: 27px; }
         
-        /* Достижения */
         .achievements-list {
             max-height: 350px;
             overflow-y: auto;
@@ -697,15 +683,16 @@
             font-size: 13px;
             border: 1px solid rgba(255,255,255,0.1);
             transition: all 0.3s;
+            cursor: pointer;
         }
         .achievement-item:not(.locked):hover {
             background: rgba(255,255,255,0.1);
             transform: translateX(5px);
+            border-color: var(--neon-blue);
         }
-        .achievement-item.locked { opacity: 0.35; }
+        .achievement-item.locked { opacity: 0.35; cursor: not-allowed; }
         .achievement-emoji { font-size: 28px; }
         
-        /* Уведомления */
         .notification {
             position: fixed;
             top: 70px;
@@ -731,7 +718,6 @@
         .notification.success { border-color: var(--neon-green); box-shadow: 0 0 30px rgba(57, 255, 20, 0.5); }
         .notification.love { border-color: var(--neon-pink); box-shadow: 0 0 30px rgba(255, 0, 110, 0.5); }
         
-        /* Плавающие числа */
         .floating-number {
             position: absolute;
             font-size: 24px;
@@ -747,21 +733,29 @@
             100% { opacity: 0; transform: translateY(-100px) scale(1.5); }
         }
         
-        /* Адаптивность для ТВ */
         @media (min-width: 1200px) {
             .top-bar { font-size: 20px; padding: 18px 25px; }
             .needs-bar { font-size: 16px; padding: 14px 20px; }
             .extra-stats { font-size: 16px; padding: 10px 20px; }
+            .scene-visual { min-height: 500px; max-width: 600px; }
             .character-container { width: 280px; height: 400px; }
-            .scene-visual { min-height: 500px; }
-            .event-text { font-size: 22px; padding: 20px; }
+            .event-text { font-size: 22px; padding: 20px; max-width: 600px; }
             .action-btn { font-size: 20px; padding: 22px 10px; }
             .request-bubble { font-size: 18px; padding: 14px 20px; }
             .tap-button { width: 180px; height: 180px; font-size: 24px; }
             .character-name { font-size: 24px; }
+            .scene-label { font-size: 18px; padding: 8px 16px; }
+            .main-screen {
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+                gap: 30px;
+                padding: 20px 40px;
+            }
+            .scene-visual { flex: 1; max-width: 50%; }
+            .event-text { flex: 1; max-width: 45%; margin: 0; }
         }
         
-        /* Маленькие мобилки */
         @media (max-width: 360px) {
             .character-container { width: 140px; height: 200px; }
             .action-btn { font-size: 10px; padding: 10px 2px; }
@@ -771,9 +765,7 @@
 </head>
 <body>
 
-    <!-- Частицы на фоне -->
     <div class="particles" id="particles"></div>
-
     <button class="settings-btn" onclick="openSettings()">⚙️</button>
 
     <div id="loadingScreen">
@@ -849,60 +841,48 @@
     </div>
 
     <div class="main-screen" id="mainScreen" style="display: none;">
-        <div class="scene-visual">
+        <div class="scene-visual" id="sceneVisual">
             <div class="request-bubble" id="requestBubble" style="display: none;"></div>
             <div class="speech-bubble" id="speechBubble"></div>
             <div class="character-name" id="charName">Малыш</div>
             
-            <!-- ПЕРСОНАЖ В ПОЛНЫЙ РОСТ (SVG) -->
             <div class="character-container">
                 <svg class="character-svg" viewBox="0 0 180 260" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Тень под персонажем -->
                     <ellipse cx="90" cy="250" rx="50" ry="8" fill="rgba(0,0,0,0.3)"/>
                     
-                    <!-- Левая нога -->
                     <g class="char-leg-left">
                         <rect x="68" y="180" width="18" height="60" rx="9" fill="#2c3e50" stroke="#000" stroke-width="2"/>
                         <ellipse cx="77" cy="242" rx="12" ry="6" fill="#1a1a1a"/>
                     </g>
                     
-                    <!-- Правая нога -->
                     <g class="char-leg-right">
                         <rect x="94" y="180" width="18" height="60" rx="9" fill="#2c3e50" stroke="#000" stroke-width="2"/>
                         <ellipse cx="103" cy="242" rx="12" ry="6" fill="#1a1a1a"/>
                     </g>
                     
-                    <!-- Тело -->
                     <rect id="charBody" x="55" y="90" width="70" height="95" rx="15" fill="url(#bodyGradient)" stroke="#000" stroke-width="2"/>
                     
-                    <!-- Левая рука -->
                     <g class="char-arm-left">
                         <rect x="38" y="95" width="18" height="65" rx="9" fill="#ffdbac" stroke="#000" stroke-width="2"/>
                         <circle cx="47" cy="162" r="9" fill="#ffdbac" stroke="#000" stroke-width="2"/>
                     </g>
                     
-                    <!-- Правая рука -->
                     <g class="char-arm-right">
                         <rect x="124" y="95" width="18" height="65" rx="9" fill="#ffdbac" stroke="#000" stroke-width="2"/>
                         <circle cx="133" cy="162" r="9" fill="#ffdbac" stroke="#000" stroke-width="2"/>
                     </g>
                     
-                    <!-- Голова -->
                     <circle cx="90" cy="55" r="40" fill="#ffdbac" stroke="#000" stroke-width="2"/>
                     
-                    <!-- Волосы (меняются с полом) -->
                     <path id="charHair" d="M 50 50 Q 50 15 90 15 Q 130 15 130 50 Q 130 35 90 30 Q 50 35 50 50 Z" fill="#4a2c1a"/>
                     
-                    <!-- Глаза -->
                     <circle id="eyeLeft" cx="75" cy="55" r="5" fill="#000"/>
                     <circle id="eyeRight" cx="105" cy="55" r="5" fill="#000"/>
                     <circle cx="76" cy="53" r="1.5" fill="#fff"/>
                     <circle cx="106" cy="53" r="1.5" fill="#fff"/>
                     
-                    <!-- Рот -->
                     <path id="charMouth" d="M 75 75 Q 90 85 105 75" stroke="#000" stroke-width="2.5" fill="none" stroke-linecap="round"/>
                     
-                    <!-- Градиенты -->
                     <defs>
                         <linearGradient id="bodyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                             <stop offset="0%" style="stop-color:#4a90e2"/>
@@ -950,7 +930,6 @@
         </button>
     </div>
 
-    <!-- Модальные окна -->
     <div class="modal" id="pathModal">
         <div class="modal-content">
             <h3 id="modalTitle">Выбери свой путь!</h3>
@@ -976,6 +955,10 @@
                 <input type="range" id="musicVolume" min="0" max="100" value="30" oninput="setMusicVolume(this.value)">
             </div>
             <div class="settings-row">
+                <span>🎵 <span data-i18n="sfx">Звуки</span></span>
+                <input type="range" id="sfxVolume" min="0" max="100" value="70" oninput="setSfxVolume(this.value)">
+            </div>
+            <div class="settings-row">
                 <span>📳 <span data-i18n="vibration">Вибрация</span></span>
                 <div class="toggle-switch on" id="vibrationToggle" onclick="toggleVibration()"></div>
             </div>
@@ -993,7 +976,7 @@
     <div class="notification" id="notification"></div>
 
     <script>
-        // --- СОЗДАНИЕ ЧАСТИЦ НА ФОНЕ ---
+        // --- СОЗДАНИЕ ЧАСТИЦ ---
         function createParticles() {
             const container = document.getElementById('particles');
             const colors = ['#ff006e', '#00f5ff', '#b026ff', '#39ff14', '#ffea00'];
@@ -1024,7 +1007,7 @@
                 btn_clean: "Помыть", btn_play: "Играть", btn_achieve: "Награды",
                 btn_next: "Следующий месяц",
                 achieve_title: "Достижения", share: "Поделиться", close: "Закрыть",
-                settings: "Настройки", music: "Музыка", vibration: "Вибрация", language: "Язык",
+                settings: "Настройки", music: "Музыка", sfx: "Звуки", vibration: "Вибрация", language: "Язык",
                 req_hungry: "🍼 Корми меня!",
                 req_hungry2: "🍼 Я расту! Покорми!",
                 req_thirsty: "💧 Хочу пить!",
@@ -1078,7 +1061,7 @@
                 btn_clean: "Clean", btn_play: "Play", btn_achieve: "Awards",
                 btn_next: "Next month",
                 achieve_title: "Achievements", share: "Share", close: "Close",
-                settings: "Settings", music: "Music", vibration: "Vibration", language: "Language",
+                settings: "Settings", music: "Music", sfx: "Sounds", vibration: "Vibration", language: "Language",
                 req_hungry: "🍼 Feed me!",
                 req_hungry2: "🍼 I'm growing! Feed me!",
                 req_thirsty: "💧 I'm thirsty!",
@@ -1123,7 +1106,17 @@
             }
         };
 
-        // --- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ---
+        const lifeBackgrounds = {
+            baby: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
+            kindergarten: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+            school: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            college: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+            university: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+            work: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+            rich: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+            mansion: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)'
+        };
+
         let ysdk = null;
         let player = null;
         let currentLang = 'ru';
@@ -1134,10 +1127,12 @@
         let loveTimer = null;
         let audioCtx = null;
         let musicGain = null;
-        let settings = { musicVolume: 30, vibration: true, language: 'ru' };
+        let sfxGain = null;
+        let settings = { musicVolume: 30, sfxVolume: 70, vibration: true, language: 'ru' };
         let gameStarted = false;
+        let currentLifeStage = 'baby';
 
-        // --- АУДИО ---
+        // --- АУДИО СИСТЕМА ---
         function initAudio() {
             if (audioCtx) return;
             try {
@@ -1145,6 +1140,11 @@
                 musicGain = audioCtx.createGain();
                 musicGain.gain.value = settings.musicVolume / 100 * 0.3;
                 musicGain.connect(audioCtx.destination);
+                
+                sfxGain = audioCtx.createGain();
+                sfxGain.gain.value = settings.sfxVolume / 100;
+                sfxGain.connect(audioCtx.destination);
+                
                 playAmbientMusic();
             } catch(e) { console.log('Audio not supported'); }
         }
@@ -1173,9 +1173,118 @@
             playNote();
         }
         
+        // --- ЗВУКОВЫЕ ЭФФЕКТЫ ---
+        function playEatSound() {
+            if (!audioCtx || settings.sfxVolume === 0) return;
+            // "Ням-ням" - короткие чавкающие звуки
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.value = 150 + Math.random() * 50;
+                    const now = audioCtx.currentTime;
+                    gain.gain.setValueAtTime(0, now);
+                    gain.gain.linearRampToValueAtTime(0.3, now + 0.05);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.15);
+                    osc.connect(gain);
+                    gain.connect(sfxGain);
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+                }, i * 200);
+            }
+        }
+        
+        function playDrinkSound() {
+            if (!audioCtx || settings.sfxVolume === 0) return;
+            // Звук питья - бульканье
+            for (let i = 0; i < 4; i++) {
+                setTimeout(() => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.value = 400 + Math.random() * 200;
+                    const now = audioCtx.currentTime;
+                    gain.gain.setValueAtTime(0, now);
+                    gain.gain.linearRampToValueAtTime(0.2, now + 0.03);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.1);
+                    osc.connect(gain);
+                    gain.connect(sfxGain);
+                    osc.start(now);
+                    osc.stop(now + 0.1);
+                }, i * 150);
+            }
+        }
+        
+        function playSleepSound() {
+            if (!audioCtx || settings.sfxVolume === 0) return;
+            // Тихий храп
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = 80;
+            const now = audioCtx.currentTime;
+            gain.gain.setValueAtTime(0, now);
+            gain.gain.linearRampToValueAtTime(0.25, now + 0.5);
+            gain.gain.linearRampToValueAtTime(0, now + 2);
+            osc.connect(gain);
+            gain.connect(sfxGain);
+            osc.start(now);
+            osc.stop(now + 2);
+        }
+        
+        function playCleanSound() {
+            if (!audioCtx || settings.sfxVolume === 0) return;
+            // Звук воды (душ) - белый шум
+            const bufferSize = audioCtx.sampleRate * 1.5;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = (Math.random() * 2 - 1) * 0.3;
+            }
+            const source = audioCtx.createBufferSource();
+            source.buffer = buffer;
+            const gain = audioCtx.createGain();
+            const now = audioCtx.currentTime;
+            gain.gain.setValueAtTime(0, now);
+            gain.gain.linearRampToValueAtTime(0.4, now + 0.2);
+            gain.gain.linearRampToValueAtTime(0, now + 1.5);
+            source.connect(gain);
+            gain.connect(sfxGain);
+            source.start(now);
+        }
+        
+        function playPlaySound() {
+            if (!audioCtx || settings.sfxVolume === 0) return;
+            // Радостный "Ура!" - восходящая мелодия
+            const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+            notes.forEach((freq, i) => {
+                setTimeout(() => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'square';
+                    osc.frequency.value = freq;
+                    const now = audioCtx.currentTime;
+                    gain.gain.setValueAtTime(0, now);
+                    gain.gain.linearRampToValueAtTime(0.25, now + 0.05);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.2);
+                    osc.connect(gain);
+                    gain.connect(sfxGain);
+                    osc.start(now);
+                    osc.stop(now + 0.2);
+                }, i * 100);
+            });
+        }
+        
         function setMusicVolume(val) {
             settings.musicVolume = parseInt(val);
             if (musicGain) musicGain.gain.value = settings.musicVolume / 100 * 0.3;
+            saveSettings();
+        }
+        
+        function setSfxVolume(val) {
+            settings.sfxVolume = parseInt(val);
+            if (sfxGain) sfxGain.gain.value = settings.sfxVolume / 100;
             saveSettings();
         }
         
@@ -1197,6 +1306,7 @@
             const s = localStorage.getItem('lifeSimSettings');
             if (s) settings = { ...settings, ...JSON.parse(s) };
             document.getElementById('musicVolume').value = settings.musicVolume;
+            document.getElementById('sfxVolume').value = settings.sfxVolume;
             document.getElementById('languageSelect').value = settings.language;
             if (!settings.vibration) document.getElementById('vibrationToggle').classList.remove('on');
         }
@@ -1213,7 +1323,6 @@
             updateUI();
         }
 
-        // --- ЛОКАЛИЗАЦИЯ ---
         function getSafeLang(lang) {
             return ['ru', 'en'].includes(lang) ? lang : 'ru';
         }
@@ -1228,7 +1337,6 @@
             });
         }
 
-        // --- СОЗДАНИЕ ПЕРСОНАЖА ---
         function selectGender(gender) {
             selectedGender = gender;
             document.querySelectorAll('.gender-btn').forEach(btn => btn.classList.remove('selected'));
@@ -1247,6 +1355,7 @@
             game.saveProgress();
             updateUI();
             updateCharacterVisual();
+            updateBackground();
             startRequestSystem();
             startLoveSystem();
             unlockAchievement('ach_first_feed');
@@ -1265,7 +1374,6 @@
             document.getElementById('actionsPanel').style.display = 'grid';
         }
 
-        // --- SDK ---
         YaGames.init().then(ysdkInstance => {
             ysdk = ysdkInstance;
             const detectedLang = ysdk.environment.i18n.lang;
@@ -1284,6 +1392,7 @@
                             checkLevelUp();
                             updateUI();
                             updateCharacterVisual();
+                            updateBackground();
                             startRequestSystem();
                             startLoveSystem();
                             gameStarted = true;
@@ -1300,6 +1409,7 @@
                         checkLevelUp();
                         updateUI();
                         updateCharacterVisual();
+                        updateBackground();
                         startRequestSystem();
                         startLoveSystem();
                         gameStarted = true;
@@ -1318,7 +1428,6 @@
             document.getElementById('characterCreation').style.display = 'flex';
         });
 
-        // --- СОСТОЯНИЕ ИГРЫ ---
         const defaultState = {
             name: '', gender: null,
             ageYears: 0, ageMonths: 0,
@@ -1344,7 +1453,6 @@
         };
         let gameState = { ...defaultState };
 
-        // --- ДОСТИЖЕНИЯ ---
         const achievementsList = [
             { id: 'ach_first_feed', emoji: '🍼' },
             { id: 'ach_kindergarten', emoji: '🏫' },
@@ -1362,7 +1470,6 @@
             { id: 'ach_bond_100', emoji: '💖' }
         ];
 
-        // --- ТЕЛЕФОНЫ ---
         const phoneModels = [
             { name: 'Кнопочный', price: 1000 },
             { name: 'Простой смартфон', price: 5000 },
@@ -1381,7 +1488,6 @@
             return Math.floor(100 * Math.pow(1.08, lvl));
         }
 
-        // --- ОБНОВЛЕНИЕ ВИЗУАЛА ПЕРСОНАЖА ---
         function updateCharacterVisual() {
             const age = gameState.ageYears;
             const g = gameState.gender;
@@ -1389,7 +1495,6 @@
             const body = document.getElementById('charBody');
             const mouth = document.getElementById('charMouth');
             
-            // Волосы меняются с полом и возрастом
             if (g === 'female') {
                 hair.setAttribute('d', 'M 45 55 Q 45 10 90 10 Q 135 10 135 55 Q 135 25 90 20 Q 45 25 45 55 Z');
                 hair.setAttribute('fill', '#8b4513');
@@ -1401,18 +1506,16 @@
                 hair.setAttribute('fill', '#4a2c1a');
             }
             
-            // Младенец — без волос
             if (age < 1) {
                 hair.setAttribute('d', 'M 55 45 Q 90 30 125 45');
                 hair.setAttribute('fill', 'none');
             }
             
-            // Тело меняет цвет с карьерой/возрастом
             let bodyColor1 = '#4a90e2', bodyColor2 = '#357abd';
-            if (age < 2) { bodyColor1 = '#ffb6c1'; bodyColor2 = '#ff69b4'; } // Младенец — розовый
-            else if (age < 7) { bodyColor1 = '#ffd700'; bodyColor2 = '#ffa500'; } // Малыш — жёлтый
-            else if (gameState.education === 'school') { bodyColor1 = '#3498db'; bodyColor2 = '#2980b9'; } // Школьная форма
-            else if (gameState.education === 'college' || gameState.education === 'university') { bodyColor1 = '#9b59b6'; bodyColor2 = '#8e44ad'; } // Студент
+            if (age < 2) { bodyColor1 = '#ffb6c1'; bodyColor2 = '#ff69b4'; }
+            else if (age < 7) { bodyColor1 = '#ffd700'; bodyColor2 = '#ffa500'; }
+            else if (gameState.education === 'school') { bodyColor1 = '#3498db'; bodyColor2 = '#2980b9'; }
+            else if (gameState.education === 'college' || gameState.education === 'university') { bodyColor1 = '#9b59b6'; bodyColor2 = '#8e44ad'; }
             else if (gameState.career === 'worker' || gameState.career === 'specialist') { bodyColor1 = '#27ae60'; bodyColor2 = '#229954'; }
             else if (gameState.career === 'manager') { bodyColor1 = '#2c3e50'; bodyColor2 = '#34495e'; }
             else if (gameState.career === 'director' || gameState.career === 'ceo') { bodyColor1 = '#1a1a1a'; bodyColor2 = '#333'; }
@@ -1421,13 +1524,32 @@
             grad.children[0].setAttribute('stop-color', bodyColor1);
             grad.children[1].setAttribute('stop-color', bodyColor2);
             
-            // Рот меняется с настроением
             if (gameState.happiness > 70) {
-                mouth.setAttribute('d', 'M 75 75 Q 90 85 105 75'); // Улыбка
+                mouth.setAttribute('d', 'M 75 75 Q 90 85 105 75');
             } else if (gameState.happiness > 40) {
-                mouth.setAttribute('d', 'M 75 78 L 105 78'); // Нейтральный
+                mouth.setAttribute('d', 'M 75 78 L 105 78');
             } else {
-                mouth.setAttribute('d', 'M 75 82 Q 90 72 105 82'); // Грусть
+                mouth.setAttribute('d', 'M 75 82 Q 90 72 105 82');
+            }
+        }
+
+        function updateBackground() {
+            const age = gameState.ageYears;
+            let stage = 'baby';
+            
+            if (gameState.housing === 'mansion') stage = 'mansion';
+            else if (gameState.money >= 1000000) stage = 'rich';
+            else if (gameState.career !== 'none') stage = 'work';
+            else if (gameState.education === 'university') stage = 'university';
+            else if (gameState.education === 'college') stage = 'college';
+            else if (gameState.education === 'school') stage = 'school';
+            else if (gameState.education === 'kindergarten') stage = 'kindergarten';
+            
+            if (stage !== currentLifeStage) {
+                currentLifeStage = stage;
+                document.body.style.background = lifeBackgrounds[stage];
+                document.body.style.backgroundSize = '400% 400%';
+                document.body.style.animation = 'bgGradient 15s ease infinite';
             }
         }
 
@@ -1457,7 +1579,6 @@
             return t.scene_home;
         }
 
-        // --- СИСТЕМА ПРОСЬБ ---
         function startRequestSystem() {
             if (requestTimer) clearInterval(requestTimer);
             let interval = 2000;
@@ -1512,7 +1633,6 @@
             }
         }
 
-        // --- СИСТЕМА ПРИВЯЗАННОСТИ ---
         function startLoveSystem() {
             if (loveTimer) clearInterval(loveTimer);
             loveTimer = setInterval(() => {
@@ -1543,12 +1663,11 @@
             const bubble = document.getElementById('speechBubble');
             bubble.innerText = text;
             bubble.classList.remove('show');
-            void bubble.offsetWidth; // reflow
+            void bubble.offsetWidth;
             bubble.classList.add('show');
             setTimeout(() => bubble.classList.remove('show'), 3000);
         }
 
-        // --- ОСНОВНАЯ ЛОГИКА ---
         const game = {
             tap: function() {
                 if (gameState.ageYears < 2) return;
@@ -1592,6 +1711,7 @@
                             gameState.happiness += 5;
                             gameState.bond = Math.min(100, gameState.bond + 3);
                             fulfillRequest('eat');
+                            playEatSound();
                             showSpeechBubble(t.thanks_feed);
                             setEvent(t.thanks_feed);
                         } else {
@@ -1605,6 +1725,7 @@
                             if (age >= 3) gameState.money -= drinkCost;
                             gameState.thirst = Math.min(100, gameState.thirst + 50);
                             fulfillRequest('drink');
+                            playDrinkSound();
                             showSpeechBubble(t.thanks_drink);
                             setEvent(t.thanks_drink);
                         }
@@ -1613,12 +1734,14 @@
                         gameState.sleep = Math.min(100, gameState.sleep + 60);
                         gameState.happiness += 5;
                         fulfillRequest('sleep');
+                        playSleepSound();
                         showSpeechBubble(t.thanks_sleep);
                         setEvent(t.thanks_sleep);
                         break;
                     case 'clean':
                         gameState.hygiene = Math.min(100, gameState.hygiene + 70);
                         fulfillRequest('clean');
+                        playCleanSound();
                         if (activeRequest && activeRequest.type === 'clean' && activeRequest.text.includes('💩')) {
                             showSpeechBubble(t.thanks_wipe);
                             showNotification(t.thanks_wipe, 'success');
@@ -1638,6 +1761,7 @@
                         gameState.bond = Math.min(100, gameState.bond + 5);
                         fulfillRequest('play');
                         fulfillRequest('walk');
+                        playPlaySound();
                         showSpeechBubble(t.thanks_play);
                         setEvent(t.thanks_play);
                         gameState.mind = Math.min(100, gameState.mind + 1);
@@ -1718,6 +1842,7 @@
                 if (gameState.hunger < 30 || gameState.thirst < 30 || gameState.hygiene < 30) gameState.happiness -= 5;
                 
                 updateCharacterVisual();
+                updateBackground();
                 checkLevelUp();
                 this.saveProgress();
                 updateUI();

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ЖИЗНЬ: С НУЛЯ ДО 1000 УРОВНЯ</title>
+    <title>VOMORG: Жизнь с нуля</title>
     <script src="https://yandex.ru/games/sdk/v2"></script>
     <style>
         :root {
@@ -15,21 +15,42 @@
             --warning: #ff9800;
             --danger: #ff4757;
             --success: #2ed573;
+            --vomorg: #ff006e;
         }
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+            width: 100%; height: 100%;
+            overflow: hidden;
+        }
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background: var(--bg-gradient);
             color: var(--text-color);
-            margin: 0;
-            padding: 0;
             display: flex;
             flex-direction: column;
             height: 100vh;
             user-select: none;
             -webkit-user-select: none;
-            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
         }
+        
+        /* Логотип VOMORG */
+        .vomorg-logo {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: var(--vomorg);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 900;
+            font-size: 14px;
+            letter-spacing: 2px;
+            z-index: 50;
+            box-shadow: 0 4px 15px rgba(255, 0, 110, 0.5);
+            font-family: 'Arial Black', sans-serif;
+        }
+        
         /* Экран загрузки */
         #loadingScreen {
             position: fixed;
@@ -44,6 +65,7 @@
             z-index: 999;
             transition: opacity 0.3s;
         }
+        
         /* Экран создания персонажа */
         #characterCreation {
             position: fixed;
@@ -54,119 +76,111 @@
             justify-content: center;
             flex-direction: column;
             z-index: 998;
-            padding: 20px;
+            padding: 15px;
         }
         .creation-card {
             background: var(--card-bg);
-            padding: 30px;
+            padding: 20px;
             border-radius: 20px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            max-width: 400px;
+            max-width: 360px;
             width: 100%;
         }
-        .creation-card h2 { margin-top: 0; color: var(--accent); }
+        .creation-card h2 { margin-bottom: 10px; color: var(--accent); font-size: 20px; text-align: center; }
+        .creation-card p { text-align: center; margin-bottom: 15px; font-size: 14px; color: #666; }
         .gender-options {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin: 20px 0;
+            gap: 8px;
+            margin-bottom: 15px;
         }
         .gender-btn {
             background: #f0f0f0;
             border: 2px solid #ddd;
-            padding: 20px;
+            padding: 12px 6px;
             border-radius: 12px;
             cursor: pointer;
             transition: all 0.3s;
             text-align: center;
-            font-size: 14px;
+            font-size: 12px;
         }
-        .gender-btn:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        .gender-btn.selected { border-color: var(--accent); background: rgba(0, 212, 255, 0.1); }
-        .gender-emoji { font-size: 48px; display: block; margin-bottom: 10px; }
+        .gender-btn.selected { border-color: var(--accent); background: rgba(0, 212, 255, 0.15); }
+        .gender-emoji { font-size: 32px; display: block; margin-bottom: 4px; }
         .name-input {
             width: 100%;
-            padding: 12px;
+            padding: 10px;
             border: 2px solid #ddd;
             border-radius: 8px;
-            font-size: 16px;
-            margin: 10px 0;
+            font-size: 14px;
+            margin-bottom: 10px;
         }
         .start-btn {
             width: 100%;
-            background: var(--accent);
+            background: linear-gradient(135deg, var(--accent), #a855f7);
             color: white;
             border: none;
-            padding: 15px;
+            padding: 12px;
             border-radius: 12px;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            margin-top: 10px;
             transition: all 0.3s;
         }
-        .start-btn:hover { transform: scale(1.05); box-shadow: 0 5px 20px var(--accent-glow); }
-        .start-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+        .start-btn:disabled { background: #ccc; cursor: not-allowed; }
 
         /* Основной интерфейс */
-        .stats-bar {
+        .top-bar {
             background: var(--card-bg);
-            padding: 12px 15px;
+            padding: 8px 12px 8px 90px; /* Отступ под логотип */
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            font-size: 13px;
+            gap: 6px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            font-size: 12px;
             font-weight: 600;
             z-index: 10;
         }
-        .stat-item { display: flex; align-items: center; gap: 5px; }
+        .stat-item { display: flex; align-items: center; gap: 4px; }
         .level-bar-container {
             grid-column: span 2;
             background: #e0e0e0;
-            border-radius: 10px;
-            height: 16px;
-            position: relative;
+            border-radius: 8px;
+            height: 12px;
             overflow: hidden;
-            margin-top: 4px;
+            margin-top: 2px;
         }
         .level-bar-fill {
             background: linear-gradient(90deg, var(--accent), #a855f7);
             height: 100%;
             width: 0%;
-            transition: width 0.4s ease-out;
-            box-shadow: 0 0 10px var(--accent-glow);
+            transition: width 0.4s;
+            box-shadow: 0 0 8px var(--accent-glow);
         }
         .level-text {
             grid-column: span 2;
-            font-size: 11px;
+            font-size: 10px;
             color: #666;
             text-align: center;
-            margin-top: 2px;
         }
 
         /* Потребности */
         .needs-bar {
             background: var(--card-bg);
-            padding: 10px 15px;
+            padding: 6px 10px;
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            font-size: 11px;
+            gap: 5px;
+            font-size: 10px;
         }
         .need-item { text-align: center; }
         .need-bar {
             background: #e0e0e0;
-            border-radius: 5px;
-            height: 8px;
-            margin-top: 4px;
+            border-radius: 4px;
+            height: 6px;
+            margin-top: 2px;
             overflow: hidden;
         }
-        .need-fill {
-            height: 100%;
-            transition: width 0.3s;
-        }
+        .need-fill { height: 100%; transition: width 0.3s; }
         .need-fill.hunger { background: var(--warning); }
         .need-fill.thirst { background: #3498db; }
         .need-fill.energy { background: var(--success); }
@@ -176,88 +190,102 @@
         /* Центральный экран */
         .main-screen {
             flex: 1;
-            padding: 15px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            text-align: center;
+            justify-content: space-between;
             overflow-y: auto;
             position: relative;
+            min-height: 0;
         }
-        .character-visual {
-            width: 120px;
-            height: 120px;
+        .scene-visual {
+            width: 100%;
+            max-width: 400px;
+            min-height: 180px;
             background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,240,240,0.9));
-            border-radius: 50%;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 64px;
-            margin-bottom: 15px;
-            border: 4px solid var(--accent);
-            box-shadow: 0 0 30px var(--accent-glow);
+            font-size: 14px;
+            border: 3px solid var(--accent);
+            box-shadow: 0 0 20px var(--accent-glow);
+            position: relative;
+            padding: 15px;
+            flex-direction: column;
+        }
+        .character-emoji {
+            font-size: 72px;
             animation: float 3s ease-in-out infinite;
+            margin: 5px 0;
         }
         @keyframes float {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+            50% { transform: translateY(-8px); }
         }
-        .tap-button {
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent), #a855f7);
-            border: none;
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 10px 30px var(--accent-glow);
-            transition: all 0.1s;
-            margin: 15px 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-        }
-        .tap-button:active {
-            transform: scale(0.95);
-            box-shadow: 0 5px 15px var(--accent-glow);
-        }
-        .tap-amount {
-            font-size: 14px;
-            opacity: 0.9;
+        .scene-label {
+            font-size: 12px;
+            color: #555;
+            font-weight: 600;
             margin-top: 5px;
         }
+        .character-name {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--accent);
+            margin-bottom: 5px;
+        }
+        
+        /* Уведомления-просьбы */
+        .request-bubble {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: white;
+            border: 2px solid var(--warning);
+            border-radius: 15px;
+            padding: 6px 10px;
+            font-size: 11px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            animation: bounce 1s infinite;
+            max-width: 140px;
+            text-align: center;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
         .event-text {
-            font-size: 15px;
+            font-size: 13px;
             line-height: 1.4;
             color: white;
-            background: rgba(0,0,0,0.5);
-            padding: 12px;
-            border-radius: 12px;
-            min-height: 60px;
-            max-width: 100%;
-            margin-bottom: 15px;
+            background: rgba(0,0,0,0.6);
+            padding: 10px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            margin: 8px 0;
         }
 
         /* Панель действий */
         .actions-panel {
             background: var(--card-bg);
-            padding: 12px;
+            padding: 8px;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            box-shadow: 0 -4px 15px rgba(0,0,0,0.2);
+            gap: 6px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.15);
         }
-        button {
+        .action-btn {
             background: linear-gradient(135deg, var(--accent), #a855f7);
             color: white;
             border: none;
-            padding: 12px 8px;
+            padding: 10px 4px;
             border-radius: 10px;
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
@@ -265,56 +293,133 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 3px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            gap: 2px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
         }
-        button:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.3); }
-        button:active { transform: translateY(0) scale(0.98); }
-        button span.subtext { font-size: 10px; font-weight: 400; opacity: 0.9; }
-        button:disabled { background: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
+        .action-btn:active { transform: scale(0.95); }
+        .action-btn span.subtext { font-size: 9px; font-weight: 400; opacity: 0.9; }
+        .action-btn:disabled { background: #ccc; cursor: not-allowed; }
         .btn-next { grid-column: span 3; background: linear-gradient(135deg, #2196F3, #1976D2); }
         .btn-ad { background: linear-gradient(135deg, var(--warning), #f57c00); color: #000; }
+        .btn-achieve { background: linear-gradient(135deg, #ffd700, #ff8c00); color: #000; }
 
-        /* Всплывающие уведомления */
+        /* Модальное окно */
+        .modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            padding: 20px;
+        }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        .modal-content h3 { color: var(--accent); margin-bottom: 15px; }
+        .modal-content p { margin-bottom: 15px; line-height: 1.5; }
+        .modal-btn {
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        /* Список достижений */
+        .achievements-list {
+            max-height: 300px;
+            overflow-y: auto;
+            text-align: left;
+            margin: 15px 0;
+        }
+        .achievement-item {
+            padding: 8px;
+            margin: 5px 0;
+            background: #f0f0f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+        }
+        .achievement-item.locked { opacity: 0.4; }
+        .achievement-emoji { font-size: 24px; }
+        
+        /* Уведомления */
         .notification {
             position: fixed;
-            top: 100px;
+            top: 60px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(0,0,0,0.9);
             color: white;
-            padding: 15px 25px;
+            padding: 12px 20px;
             border-radius: 12px;
             opacity: 0;
             transition: all 0.3s;
             pointer-events: none;
-            z-index: 100;
-            font-size: 14px;
+            z-index: 300;
+            font-size: 13px;
             text-align: center;
             max-width: 90%;
             box-shadow: 0 5px 20px rgba(0,0,0,0.5);
         }
-        .notification.show { opacity: 1; top: 120px; }
+        .notification.show { opacity: 1; top: 70px; }
         .notification.warning { background: rgba(255, 152, 0, 0.95); }
-        .notification.danger { background: rgba(255, 71, 87, 0.95); }
-
-        /* Плавающие числа при тапе */
+        .notification.success { background: rgba(46, 213, 115, 0.95); }
+        
+        /* Плавающие числа */
         .floating-number {
             position: absolute;
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
             color: var(--accent);
             pointer-events: none;
             animation: floatUp 1s ease-out forwards;
-            text-shadow: 0 0 10px var(--accent-glow);
+            text-shadow: 0 0 8px var(--accent-glow);
+            z-index: 100;
         }
         @keyframes floatUp {
             0% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-100px); }
+            100% { opacity: 0; transform: translateY(-80px); }
+        }
+        
+        /* Адаптивность для ТВ */
+        @media (min-width: 1200px) {
+            .top-bar { font-size: 18px; padding: 15px 20px 15px 150px; }
+            .vomorg-logo { font-size: 22px; padding: 10px 20px; }
+            .needs-bar { font-size: 16px; padding: 12px 20px; }
+            .character-emoji { font-size: 120px; }
+            .scene-visual { min-height: 300px; }
+            .event-text { font-size: 20px; padding: 15px; }
+            .action-btn { font-size: 18px; padding: 20px 10px; }
+            .request-bubble { font-size: 16px; padding: 10px 15px; }
+        }
+        
+        /* Адаптивность для маленьких мобилок */
+        @media (max-width: 360px) {
+            .character-emoji { font-size: 56px; }
+            .action-btn { font-size: 10px; padding: 8px 2px; }
+            .gender-emoji { font-size: 24px; }
         }
     </style>
 </head>
 <body>
+
+    <div class="vomorg-logo">VOMORG</div>
 
     <div id="loadingScreen">
         <span id="loadingText">Загрузка...</span>
@@ -328,98 +433,113 @@
             <div class="gender-options">
                 <div class="gender-btn" data-gender="male" onclick="selectGender('male')">
                     <span class="gender-emoji">👨</span>
-                    <span data-i18n="gender_male">Мужской</span>
+                    <span data-i18n="gender_male">М</span>
                 </div>
                 <div class="gender-btn" data-gender="female" onclick="selectGender('female')">
                     <span class="gender-emoji">👩</span>
-                    <span data-i18n="gender_female">Женский</span>
+                    <span data-i18n="gender_female">Ж</span>
                 </div>
                 <div class="gender-btn" data-gender="humanoid" onclick="selectGender('humanoid')">
                     <span class="gender-emoji">🤖</span>
-                    <span data-i18n="gender_humanoid">Гуманоид</span>
+                    <span data-i18n="gender_humanoid">Гум</span>
                 </div>
             </div>
             
-            <input type="text" class="name-input" id="nameInput" placeholder="Имя персонажа" maxlength="20">
-            <button class="start-btn" id="startBtn" onclick="startGame()" disabled data-i18n="start_game">Начать жизнь</button>
+            <input type="text" class="name-input" id="nameInput" placeholder="Имя" maxlength="15">
+            <button class="start-btn" id="startBtn" onclick="startGame()" disabled data-i18n="start_game">Родить 🍼</button>
         </div>
     </div>
 
-    <div class="stats-bar" id="gameUI" style="display: none;">
-        <div class="stat-item">🎂 <span id="age">18</span> <span data-i18n="years">лет</span></div>
-        <div class="stat-item">💰 <span id="money">10 000</span> ₽</div>
-        <div class="stat-item">⚡ <span id="energy">100</span>%</div>
+    <div class="top-bar" id="gameUI" style="display: none;">
+        <div class="stat-item">🎂 <span id="age">0</span> <span data-i18n="years">лет</span></div>
+        <div class="stat-item">💰 <span id="money">0</span> ₽</div>
         <div class="stat-item">😊 <span id="happiness">80</span>%</div>
+        <div class="stat-item">🧠 <span id="iq">50</span> IQ</div>
         
         <div class="level-bar-container">
             <div class="level-bar-fill" id="xpBar"></div>
         </div>
-        <div class="level-text"><span data-i18n="level_prefix">Уровень</span> <span id="level">1</span>: <span id="levelTitle">Новичок</span></div>
-        <div class="level-text" style="font-size: 10px; color: #888;"><span data-i18n="xp_to_next">До след. уровня:</span> <span id="xpNeeded">100</span> ₽</div>
+        <div class="level-text"><span data-i18n="level_prefix">Уровень</span> <span id="level">1</span> · <span id="levelTitle">Младенец</span></div>
     </div>
 
     <div class="needs-bar" id="needsBar" style="display: none;">
         <div class="need-item">
-            <div>🍔 <span id="hungerVal">100</span>%</div>
+            <div>🍔<span id="hungerVal">100</span></div>
             <div class="need-bar"><div class="need-fill hunger" id="hungerBar" style="width: 100%"></div></div>
         </div>
         <div class="need-item">
-            <div>💧 <span id="thirstVal">100</span>%</div>
+            <div>💧<span id="thirstVal">100</span></div>
             <div class="need-bar"><div class="need-fill thirst" id="thirstBar" style="width: 100%"></div></div>
         </div>
         <div class="need-item">
-            <div>😴 <span id="sleepVal">100</span>%</div>
+            <div>😴<span id="sleepVal">100</span></div>
             <div class="need-bar"><div class="need-fill energy" id="sleepBar" style="width: 100%"></div></div>
         </div>
         <div class="need-item">
-            <div>🚿 <span id="hygieneVal">100</span>%</div>
+            <div>🚿<span id="hygieneVal">100</span></div>
             <div class="need-bar"><div class="need-fill hygiene" id="hygieneBar" style="width: 100%"></div></div>
         </div>
         <div class="need-item">
-            <div>🎮 <span id="funVal">100</span>%</div>
+            <div>🎮<span id="funVal">100</span></div>
             <div class="need-bar"><div class="need-fill fun" id="funBar" style="width: 100%"></div></div>
         </div>
     </div>
 
     <div class="main-screen" id="mainScreen" style="display: none;">
-        <div class="character-visual" id="characterEmoji">👨</div>
-        <div class="event-text" id="eventText" data-i18n="start_event">
-            Добро пожаловать в новую жизнь!
+        <div class="scene-visual">
+            <div class="request-bubble" id="requestBubble" style="display: none;"></div>
+            <div class="character-name" id="charName">Малыш</div>
+            <div class="character-emoji" id="characterEmoji">👶</div>
+            <div class="scene-label" id="sceneLabel">🏠 Дома с родителями</div>
         </div>
-        <button class="tap-button" id="tapButton" onclick="game.tap()">
-            <span>💰 ТАПАЙ</span>
-            <span class="tap-amount" id="tapAmount">+100 ₽</span>
-        </button>
+        <div class="event-text" id="eventText" data-i18n="start_event">
+            Ты только что родился! Покорми меня! 🍼
+        </div>
     </div>
 
     <div class="actions-panel" id="actionsPanel" style="display: none;">
-        <button onclick="game.action('eat')">
+        <button class="action-btn" onclick="game.action('eat')">
             🍔 <span data-i18n="btn_eat">Поесть</span>
-            <span class="subtext">-500 ₽</span>
+            <span class="subtext" id="eatCost">-50₽</span>
         </button>
-        <button onclick="game.action('drink')">
+        <button class="action-btn" onclick="game.action('drink')">
             💧 <span data-i18n="btn_drink">Попить</span>
-            <span class="subtext">-200 ₽</span>
+            <span class="subtext">-20₽</span>
         </button>
-        <button onclick="game.action('sleep')">
+        <button class="action-btn" onclick="game.action('sleep')">
             😴 <span data-i18n="btn_sleep">Спать</span>
-            <span class="subtext">+Энергия</span>
         </button>
-        <button onclick="game.action('shower')">
-            🚿 <span data-i18n="btn_shower">Душ</span>
-            <span class="subtext">+Гигиена</span>
+        <button class="action-btn" onclick="game.action('clean')">
+            🚿 <span data-i18n="btn_clean">Помыть</span>
         </button>
-        <button onclick="game.action('fun')">
-            🎮 <span data-i18n="btn_fun">Развлечься</span>
-            <span class="subtext">-1000 ₽</span>
+        <button class="action-btn" onclick="game.action('play')">
+            🎮 <span data-i18n="btn_play">Играть</span>
         </button>
-        <button class="btn-ad" onclick="game.showAd()">
-            📺 <span data-i18n="btn_ad">Реклама</span>
-            <span class="subtext">+Бонус</span>
+        <button class="action-btn btn-achieve" onclick="game.showAchievements()">
+            🏆 <span data-i18n="btn_achieve">Награды</span>
         </button>
-        <button class="btn-next" onclick="game.nextMonth()">
+        <button class="action-btn btn-next" onclick="game.nextMonth()">
             ⏭ <span data-i18n="btn_next">Следующий месяц</span>
         </button>
+    </div>
+
+    <!-- Модальное окно выбора пути -->
+    <div class="modal" id="pathModal">
+        <div class="modal-content">
+            <h3 id="modalTitle">Выбери свой путь!</h3>
+            <p id="modalText">Тебе 15 лет. Куда пойдёшь?</p>
+            <div id="modalButtons"></div>
+        </div>
+    </div>
+
+    <!-- Модальное окно достижений -->
+    <div class="modal" id="achieveModal">
+        <div class="modal-content">
+            <h3>🏆 <span data-i18n="achieve_title">Достижения</span></h3>
+            <div class="achievements-list" id="achievementsList"></div>
+            <button class="modal-btn" onclick="game.shareAchievements()" data-i18n="share">Поделиться</button>
+            <button class="modal-btn" onclick="closeModal('achieveModal')" data-i18n="close">Закрыть</button>
+        </div>
     </div>
 
     <div class="notification" id="notification"></div>
@@ -430,33 +550,83 @@
                 loading: "Загрузка...",
                 creation_title: "Создай персонажа",
                 creation_desc: "Выбери пол и имя",
-                gender_male: "Мужской", gender_female: "Женский", gender_humanoid: "Гуманоид",
-                start_game: "Начать жизнь",
-                years: "лет", level_prefix: "Уровень", xp_to_next: "До след. уровня:",
-                start_event: "Добро пожаловать в новую жизнь! Тапай кнопку, чтобы зарабатывать!",
+                gender_male: "М", gender_female: "Ж", gender_humanoid: "Гум",
+                start_game: "Родить 🍼",
+                years: "лет", level_prefix: "Уровень",
+                start_event: "Ты только что родился! Покорми меня! 🍼",
                 btn_eat: "Поесть", btn_drink: "Попить", btn_sleep: "Спать",
-                btn_shower: "Душ", btn_fun: "Развлечься", btn_ad: "Реклама", btn_next: "Следующий месяц",
-                notif_hungry: "🍔 Ты голоден!",
-                notif_thirsty: "💧 Ты хочешь пить!",
-                notif_tired: "😴 Ты устал!",
-                notif_dirty: "🚿 Пора помыться!",
-                notif_bored: "🎮 Тебе скучно!"
+                btn_clean: "Помыть", btn_play: "Играть", btn_achieve: "Награды",
+                btn_next: "Следующий месяц",
+                achieve_title: "Достижения", share: "Поделиться", close: "Закрыть",
+                req_hungry: "🍼 Покорми меня!",
+                req_thirsty: "💧 Хочу пить!",
+                req_dirty: "🧷 Убери за мной!",
+                req_tired: "😴 Хочу спать!",
+                req_bored: "🎮 Поиграй со мной!",
+                req_walk: "🚶 Хочу гулять!",
+                stage_baby: "Младенец", stage_toddler: "Малыш", stage_child: "Ребёнок",
+                stage_school: "Школьник", stage_teen: "Подросток", stage_student: "Студент",
+                stage_adult: "Взрослый", stage_rich: "Богач", stage_millionaire: "Миллионер",
+                scene_home: "🏠 Дома", scene_kindergarten: "🏫 Детский сад",
+                scene_school: "🏫 Школа", scene_college: "🎓 Колледж",
+                scene_university: "🎓 Институт", scene_work: "🏢 На работе",
+                scene_own_home: "🏠 В своей квартире", scene_mansion: "🏰 В особняке",
+                ach_first_feed: "Первое кормление", ach_kindergarten: "Первый день в садике",
+                ach_school: "Первый класс", ach_first_phone: "Первый телефон",
+                ach_graduation: "Окончание школы", ach_college: "Студент колледжа",
+                ach_university: "Студент ВУЗа", ach_first_job: "Первая работа",
+                ach_first_flat: "Своя квартира", ach_license: "Водительские права",
+                ach_diploma: "Диплом", ach_promotion: "Повышение",
+                ach_millionaire: "Миллионер!",
+                modal_path_title: "Выбери свой путь!",
+                modal_path_text: "Тебе 15 лет. Куда пойдёшь?",
+                path_college: "🎓 Колледж (3 года)",
+                path_university: "🎓 Институт (5 лет)",
+                path_work: "💼 Сразу работать",
+                modal_rent_title: "Пора съезжать!",
+                modal_rent_text: "Нужно снять квартиру. Это стоит 30 000₽ (2 недели работы).",
+                rent_accept: "Снять", rent_later: "Позже"
             },
             en: {
                 loading: "Loading...",
                 creation_title: "Create character",
                 creation_desc: "Choose gender and name",
-                gender_male: "Male", gender_female: "Female", gender_humanoid: "Humanoid",
-                start_game: "Start life",
-                years: "years", level_prefix: "Level", xp_to_next: "To next level:",
-                start_event: "Welcome to a new life! Tap the button to earn!",
+                gender_male: "M", gender_female: "F", gender_humanoid: "Hum",
+                start_game: "Give birth 🍼",
+                years: "yo", level_prefix: "Level",
+                start_event: "You were just born! Feed me! 🍼",
                 btn_eat: "Eat", btn_drink: "Drink", btn_sleep: "Sleep",
-                btn_shower: "Shower", btn_fun: "Have fun", btn_ad: "Watch Ad", btn_next: "Next month",
-                notif_hungry: "🍔 You're hungry!",
-                notif_thirsty: "💧 You're thirsty!",
-                notif_tired: "😴 You're tired!",
-                notif_dirty: "🚿 Time to shower!",
-                notif_bored: "🎮 You're bored!"
+                btn_clean: "Clean", btn_play: "Play", btn_achieve: "Awards",
+                btn_next: "Next month",
+                achieve_title: "Achievements", share: "Share", close: "Close",
+                req_hungry: "🍼 Feed me!",
+                req_thirsty: "💧 I'm thirsty!",
+                req_dirty: "🧷 Clean me!",
+                req_tired: "😴 I'm sleepy!",
+                req_bored: "🎮 Play with me!",
+                req_walk: "🚶 Let's walk!",
+                stage_baby: "Baby", stage_toddler: "Toddler", stage_child: "Child",
+                stage_school: "Schoolkid", stage_teen: "Teen", stage_student: "Student",
+                stage_adult: "Adult", stage_rich: "Rich", stage_millionaire: "Millionaire",
+                scene_home: "🏠 At home", scene_kindergarten: "🏫 Kindergarten",
+                scene_school: "🏫 School", scene_college: "🎓 College",
+                scene_university: "🎓 University", scene_work: "🏢 At work",
+                scene_own_home: "🏠 Own flat", scene_mansion: "🏰 Mansion",
+                ach_first_feed: "First feeding", ach_kindergarten: "First day at kindergarten",
+                ach_school: "First grade", ach_first_phone: "First phone",
+                ach_graduation: "School graduation", ach_college: "College student",
+                ach_university: "Uni student", ach_first_job: "First job",
+                ach_first_flat: "Own flat", ach_license: "Driver's license",
+                ach_diploma: "Diploma", ach_promotion: "Promotion",
+                ach_millionaire: "Millionaire!",
+                modal_path_title: "Choose your path!",
+                modal_path_text: "You are 15. Where do you go?",
+                path_college: "🎓 College (3 years)",
+                path_university: "🎓 University (5 years)",
+                path_work: "💼 Work now",
+                modal_rent_title: "Time to move out!",
+                modal_rent_text: "Need to rent a flat. It costs 30,000₽ (2 weeks of work).",
+                rent_accept: "Rent", rent_later: "Later"
             }
         };
 
@@ -464,6 +634,8 @@
         let player = null;
         let currentLang = 'ru';
         let selectedGender = null;
+        let activeRequest = null;
+        let requestTimer = null;
 
         function getSafeLang(lang) {
             return ['ru', 'en'].includes(lang) ? lang : 'ru';
@@ -487,21 +659,23 @@
         }
 
         function startGame() {
-            const name = document.getElementById('nameInput').value || 'Игрок';
+            const name = document.getElementById('nameInput').value.trim() || (currentLang === 'ru' ? 'Малыш' : 'Baby');
             gameState.name = name;
             gameState.gender = selectedGender;
             
-            const emojis = { male: '👨', female: '👩', humanoid: '🤖' };
-            document.getElementById('characterEmoji').innerText = emojis[selectedGender];
-            
             document.getElementById('characterCreation').style.display = 'none';
+            showGameUI();
+            game.saveProgress();
+            updateUI();
+            startRequestSystem();
+            unlockAchievement('ach_first_feed');
+        }
+
+        function showGameUI() {
             document.getElementById('gameUI').style.display = 'grid';
             document.getElementById('needsBar').style.display = 'grid';
             document.getElementById('mainScreen').style.display = 'flex';
             document.getElementById('actionsPanel').style.display = 'grid';
-            
-            game.saveProgress();
-            updateUI();
         }
 
         YaGames.init().then(ysdkInstance => {
@@ -515,45 +689,27 @@
                 ysdk.getPlayer().then(_player => {
                     player = _player;
                     player.getData().then(data => {
-                        if (data.totalEarned !== undefined) {
+                        if (data.name) {
                             gameState = { ...defaultState, ...data };
-                            if (gameState.gender && gameState.name) {
-                                document.getElementById('characterCreation').style.display = 'none';
-                                document.getElementById('gameUI').style.display = 'grid';
-                                document.getElementById('needsBar').style.display = 'grid';
-                                document.getElementById('mainScreen').style.display = 'flex';
-                                document.getElementById('actionsPanel').style.display = 'grid';
-                                const emojis = { male: '👨', female: '👩', humanoid: '🤖' };
-                                document.getElementById('characterEmoji').innerText = emojis[gameState.gender];
-                                checkLevelUp();
-                                updateUI();
-                            } else {
-                                document.getElementById('characterCreation').style.display = 'flex';
-                            }
+                            showGameUI();
+                            checkLevelUp();
+                            updateUI();
+                            startRequestSystem();
                         } else {
                             document.getElementById('characterCreation').style.display = 'flex';
                         }
                     });
                 }).catch(() => {
-                    const saved = localStorage.getItem('lifeFromZeroSave');
+                    const saved = localStorage.getItem('vomorgSave');
                     if (saved) {
                         gameState = { ...defaultState, ...JSON.parse(saved) };
-                        if (gameState.gender && gameState.name) {
-                            document.getElementById('characterCreation').style.display = 'none';
-                            document.getElementById('gameUI').style.display = 'grid';
-                            document.getElementById('needsBar').style.display = 'grid';
-                            document.getElementById('mainScreen').style.display = 'flex';
-                            document.getElementById('actionsPanel').style.display = 'grid';
-                            const emojis = { male: '👨', female: '👩', humanoid: '🤖' };
-                            document.getElementById('characterEmoji').innerText = emojis[gameState.gender];
-                            checkLevelUp();
-                        } else {
-                            document.getElementById('characterCreation').style.display = 'flex';
-                        }
+                        showGameUI();
+                        checkLevelUp();
+                        updateUI();
+                        startRequestSystem();
                     } else {
                         document.getElementById('characterCreation').style.display = 'flex';
                     }
-                    updateUI();
                 });
             }, 300);
         }).catch(e => {
@@ -561,135 +717,420 @@
             applyLanguage('ru');
             document.getElementById('loadingScreen').style.display = 'none';
             document.getElementById('characterCreation').style.display = 'flex';
-            updateUI();
         });
 
         const defaultState = {
             name: '', gender: null,
-            ageMonths: 216, money: 10000, energy: 100, happiness: 80,
-            level: 1, totalEarned: 10000,
-            hunger: 100, thirst: 100, sleep: 100, hygiene: 100, fun: 100
+            ageYears: 0, ageMonths: 0,
+            money: 0, happiness: 80, iq: 50,
+            level: 1, totalEarned: 0,
+            hunger: 100, thirst: 100, sleep: 100, hygiene: 100, fun: 100,
+            education: 'none', // none, kindergarten, school, college, university
+            educationYearsLeft: 0,
+            career: 'none', // none, worker, specialist, manager, director, ceo
+            careerYears: 0,
+            housing: 'parents', // parents, rented, own, mansion
+            phoneModel: 0, // 0 = нет, 1-10 = модели
+            achievements: [],
+            pathChosen: false,
+            rentedFlat: false,
+            hasLicense: false,
+            hasDiploma: false
         };
         let gameState = { ...defaultState };
 
+        // Список достижений
+        const achievementsList = [
+            { id: 'ach_first_feed', emoji: '🍼' },
+            { id: 'ach_kindergarten', emoji: '🏫' },
+            { id: 'ach_school', emoji: '📚' },
+            { id: 'ach_first_phone', emoji: '📱' },
+            { id: 'ach_graduation', emoji: '🎓' },
+            { id: 'ach_college', emoji: '🎒' },
+            { id: 'ach_university', emoji: '🏛️' },
+            { id: 'ach_first_job', emoji: '💼' },
+            { id: 'ach_first_flat', emoji: '🏠' },
+            { id: 'ach_license', emoji: '🚗' },
+            { id: 'ach_diploma', emoji: '📜' },
+            { id: 'ach_promotion', emoji: '📈' },
+            { id: 'ach_millionaire', emoji: '💎' }
+        ];
+
+        // Модели телефонов (по году, с 10 лет)
+        const phoneModels = [
+            { name: 'Кнопочный', price: 1000 },
+            { name: 'Простой смартфон', price: 5000 },
+            { name: 'Средний смартфон', price: 15000 },
+            { name: 'Флагман', price: 30000 },
+            { name: 'Премиум', price: 60000 },
+            { name: 'Pro', price: 100000 },
+            { name: 'Pro Max', price: 150000 },
+            { name: 'Ultra', price: 250000 },
+            { name: 'Gold Edition', price: 500000 },
+            { name: 'Diamond', price: 1000000 }
+        ];
+
         function getXpForNextLevel(lvl) {
             if (lvl >= 1000) return Infinity;
-            return Math.floor(100 * Math.pow(1.05, lvl));
+            return Math.floor(100 * Math.pow(1.08, lvl));
+        }
+
+        function getCharacterEmoji() {
+            const age = gameState.ageYears;
+            const g = gameState.gender;
+            if (age < 2) return '👶';
+            if (age < 7) return g === 'female' ? '👧' : (g === 'humanoid' ? '🤖' : '👦');
+            if (age < 15) return g === 'female' ? '👧' : (g === 'humanoid' ? '🤖' : '👦');
+            if (age < 18) return g === 'female' ? '👩' : (g === 'humanoid' ? '🤖' : '👨');
+            if (age < 30) return g === 'female' ? '👩' : (g === 'humanoid' ? '🤖' : '👨');
+            if (age < 50) return g === 'female' ? '👩‍💼' : (g === 'humanoid' ? '🤖' : '👨‍💼');
+            if (age < 65) return g === 'female' ? '👵' : (g === 'humanoid' ? '🤖' : '👴');
+            return '🧓';
+        }
+
+        function getLifeStage() {
+            const age = gameState.ageYears;
+            const t = translations[currentLang];
+            if (age < 2) return t.stage_baby;
+            if (age < 7) return t.stage_toddler;
+            if (age < 15) return t.stage_child;
+            if (age < 18) return t.stage_teen;
+            if (gameState.education === 'college' || gameState.education === 'university') return t.stage_student;
+            if (gameState.money >= 10000000) return t.stage_millionaire;
+            if (gameState.money >= 1000000) return t.stage_rich;
+            return t.stage_adult;
+        }
+
+        function getScene() {
+            const age = gameState.ageYears;
+            const t = translations[currentLang];
+            if (gameState.housing === 'mansion') return t.scene_mansion;
+            if (gameState.housing === 'own') return t.scene_own_home;
+            if (gameState.housing === 'rented') return t.scene_own_home;
+            if (gameState.education === 'kindergarten') return t.scene_kindergarten;
+            if (gameState.education === 'school') return t.scene_school;
+            if (gameState.education === 'college') return t.scene_college;
+            if (gameState.education === 'university') return t.scene_university;
+            if (gameState.career !== 'none') return t.scene_work;
+            return t.scene_home;
+        }
+
+        function startRequestSystem() {
+            if (requestTimer) clearInterval(requestTimer);
+            requestTimer = setInterval(() => {
+                if (Math.random() < 0.4 && !activeRequest) {
+                    generateRequest();
+                }
+            }, 8000);
+        }
+
+        function generateRequest() {
+            const t = translations[currentLang];
+            const age = gameState.ageYears;
+            let requests = [];
+            
+            if (gameState.hunger < 50) requests.push({ type: 'eat', text: t.req_hungry });
+            if (gameState.thirst < 50) requests.push({ type: 'drink', text: t.req_thirsty });
+            if (gameState.hygiene < 50) requests.push({ type: 'clean', text: t.req_dirty });
+            if (gameState.sleep < 50) requests.push({ type: 'sleep', text: t.req_tired });
+            if (gameState.fun < 50) requests.push({ type: 'play', text: t.req_bored });
+            if (age >= 2 && age < 15 && gameState.fun < 70) requests.push({ type: 'walk', text: t.req_walk });
+            
+            if (requests.length === 0) {
+                if (Math.random() < 0.5) requests.push({ type: 'eat', text: t.req_hungry });
+                else requests.push({ type: 'play', text: t.req_bored });
+            }
+            
+            activeRequest = requests[Math.floor(Math.random() * requests.length)];
+            const bubble = document.getElementById('requestBubble');
+            bubble.innerText = activeRequest.text;
+            bubble.style.display = 'block';
+        }
+
+        function fulfillRequest(type) {
+            if (activeRequest && activeRequest.type === type) {
+                activeRequest = null;
+                document.getElementById('requestBubble').style.display = 'none';
+                gameState.happiness = Math.min(100, gameState.happiness + 5);
+                showNotification(currentLang === 'ru' ? '✨ Малыш доволен!' : '✨ Baby is happy!', 'success');
+            }
         }
 
         const game = {
-            tap: function() {
-                const earn = Math.floor(100 * (1 + gameState.level * 0.1));
-                gameState.money += earn;
-                gameState.totalEarned += earn;
-                
-                // Плавающее число
-                const tapBtn = document.getElementById('tapButton');
-                const rect = tapBtn.getBoundingClientRect();
-                const floatNum = document.createElement('div');
-                floatNum.className = 'floating-number';
-                floatNum.innerText = `+${earn}`;
-                floatNum.style.left = (rect.left + rect.width / 2 - 30) + 'px';
-                floatNum.style.top = (rect.top + rect.height / 2) + 'px';
-                document.body.appendChild(floatNum);
-                setTimeout(() => floatNum.remove(), 1000);
-                
-                checkLevelUp();
-                this.saveProgress();
-                updateUI();
-            },
-
             action: function(type) {
+                const age = gameState.ageYears;
                 const t = translations[currentLang];
+                
                 switch(type) {
                     case 'eat':
-                        if (gameState.money >= 500) {
-                            gameState.money -= 500;
+                        const eatCost = age < 3 ? 50 : (age < 10 ? 100 : 200);
+                        if (gameState.money >= eatCost || age < 3) {
+                            if (age >= 3) gameState.money -= eatCost;
                             gameState.hunger = Math.min(100, gameState.hunger + 40);
                             gameState.happiness += 5;
+                            fulfillRequest('eat');
+                            setEvent(currentLang === 'ru' ? 'Ням-ням! Вкусно! 🍔' : 'Yummy! 🍔');
+                        } else {
+                            showNotification(currentLang === 'ru' ? 'Нет денег!' : 'No money!', 'warning');
+                            return;
                         }
                         break;
                     case 'drink':
-                        if (gameState.money >= 200) {
-                            gameState.money -= 200;
+                        const drinkCost = age < 3 ? 20 : 50;
+                        if (gameState.money >= drinkCost || age < 3) {
+                            if (age >= 3) gameState.money -= drinkCost;
                             gameState.thirst = Math.min(100, gameState.thirst + 50);
+                            fulfillRequest('drink');
+                            setEvent(currentLang === 'ru' ? 'Освежился! 💧' : 'Refreshed! 💧');
                         }
                         break;
                     case 'sleep':
                         gameState.sleep = Math.min(100, gameState.sleep + 60);
-                        gameState.energy = Math.min(100, gameState.energy + 30);
+                        gameState.happiness += 5;
+                        fulfillRequest('sleep');
+                        setEvent(currentLang === 'ru' ? 'Zzz... 💤' : 'Zzz... 💤');
                         break;
-                    case 'shower':
+                    case 'clean':
                         gameState.hygiene = Math.min(100, gameState.hygiene + 70);
-                        gameState.happiness += 10;
+                        fulfillRequest('clean');
+                        setEvent(currentLang === 'ru' ? 'Чистюля! 🚿' : 'All clean! 🚿');
                         break;
-                    case 'fun':
-                        if (gameState.money >= 1000) {
-                            gameState.money -= 1000;
-                            gameState.fun = Math.min(100, gameState.fun + 50);
-                            gameState.happiness += 15;
+                    case 'play':
+                        if (age >= 3 && gameState.money < 50) {
+                            showNotification(currentLang === 'ru' ? 'Нет денег!' : 'No money!', 'warning');
+                            return;
                         }
+                        if (age >= 3) gameState.money -= 50;
+                        gameState.fun = Math.min(100, gameState.fun + 40);
+                        gameState.happiness += 10;
+                        fulfillRequest('play');
+                        fulfillRequest('walk');
+                        setEvent(currentLang === 'ru' ? 'Ура, играем! 🎮' : 'Yay, playing! 🎮');
                         break;
                 }
+                
+                // Родители дают деньги ребёнку до 18 лет
+                if (age < 18 && gameState.money < 0) gameState.money = 0;
+                
                 this.saveProgress();
                 updateUI();
             },
 
             nextMonth: function() {
-                gameState.ageMonths += 1;
+                gameState.ageMonths++;
                 
                 // Потребности падают
-                gameState.hunger = Math.max(0, gameState.hunger - 30);
-                gameState.thirst = Math.max(0, gameState.thirst - 40);
-                gameState.sleep = Math.max(0, gameState.sleep - 25);
-                gameState.hygiene = Math.max(0, gameState.hygiene - 20);
-                gameState.fun = Math.max(0, gameState.fun - 35);
+                gameState.hunger = Math.max(0, gameState.hunger - 20);
+                gameState.thirst = Math.max(0, gameState.thirst - 25);
+                gameState.sleep = Math.max(0, gameState.sleep - 15);
+                gameState.hygiene = Math.max(0, gameState.hygiene - 15);
+                gameState.fun = Math.max(0, gameState.fun - 20);
                 
-                // Расходы
-                let expenses = Math.floor(5000 * (1 + gameState.level * 0.05));
-                if (gameState.money >= expenses) {
-                    gameState.money -= expenses;
-                } else {
-                    gameState.happiness -= 20;
+                // Переход на новый год
+                if (gameState.ageMonths >= 12) {
+                    gameState.ageMonths = 0;
+                    gameState.ageYears++;
+                    this.onNewYear();
                 }
-
+                
+                // Учеба/работа доход
+                if (gameState.career !== 'none') {
+                    const salary = this.getSalary();
+                    gameState.money += salary;
+                    gameState.totalEarned += salary;
+                }
+                
+                // Расходы на жизнь
+                if (gameState.ageYears >= 18) {
+                    let expenses = 5000;
+                    if (gameState.housing === 'rented') expenses += 15000;
+                    if (gameState.money >= expenses) gameState.money -= expenses;
+                    else { gameState.happiness -= 10; }
+                }
+                
+                // Автоматическая покупка телефона с 10 лет
+                if (gameState.ageYears >= 10 && gameState.ageYears <= 19) {
+                    const phoneIdx = gameState.ageYears - 10;
+                    if (phoneIdx >= gameState.phoneModel) {
+                        const phone = phoneModels[phoneIdx];
+                        if (gameState.money >= phone.price) {
+                            gameState.money -= phone.price;
+                            gameState.phoneModel = phoneIdx + 1;
+                            if (phoneIdx === 0) unlockAchievement('ach_first_phone');
+                            setEvent(currentLang === 'ru' 
+                                ? `📱 Куплен новый телефон: ${phone.name}!` 
+                                : `📱 New phone bought: ${phone.name}!`);
+                        }
+                    }
+                }
+                
+                // Уменьшение лет учебы
+                if (gameState.educationYearsLeft > 0) {
+                    gameState.educationYearsLeft--;
+                    if (gameState.educationYearsLeft === 0) {
+                        this.onEducationEnd();
+                    }
+                }
+                
+                // Автоматический переход в детский сад в 2 года
+                if (gameState.ageYears === 2 && gameState.education === 'none') {
+                    gameState.education = 'kindergarten';
+                    unlockAchievement('ach_kindergarten');
+                    setEvent(currentLang === 'ru' ? '🏫 Первый день в садике!' : '🏫 First day at kindergarten!');
+                }
+                
+                // Автоматический переход в школу в 7 лет
+                if (gameState.ageYears === 7 && gameState.education === 'kindergarten') {
+                    gameState.education = 'school';
+                    unlockAchievement('ach_school');
+                    setEvent(currentLang === 'ru' ? '📚 Первый класс! Я школьник!' : '📚 First grade! I am a schoolkid!');
+                }
+                
+                // Выбор пути в 15 лет
+                if (gameState.ageYears === 15 && !gameState.pathChosen) {
+                    this.showPathChoice();
+                }
+                
+                // Окончание школы в 18 лет
+                if (gameState.ageYears === 18 && gameState.education === 'school') {
+                    unlockAchievement('ach_graduation');
+                    setEvent(currentLang === 'ru' ? '🎓 Школа окончена!' : '🎓 School graduated!');
+                }
+                
                 // Проверка потребностей
-                this.checkNeeds();
+                if (gameState.hunger < 30 || gameState.thirst < 30 || gameState.hygiene < 30) {
+                    gameState.happiness -= 5;
+                }
+                
                 checkLevelUp();
                 this.saveProgress();
                 updateUI();
             },
-
-            checkNeeds: function() {
-                const t = translations[currentLang];
-                if (gameState.hunger < 30) showNotification(t.notif_hungry, 'warning');
-                if (gameState.thirst < 30) showNotification(t.notif_thirsty, 'warning');
-                if (gameState.sleep < 30) showNotification(t.notif_tired, 'warning');
-                if (gameState.hygiene < 30) showNotification(t.notif_dirty, 'warning');
-                if (gameState.fun < 30) showNotification(t.notif_bored, 'warning');
+            
+            onNewYear: function() {
+                const age = gameState.ageYears;
+                // Родители дают карманные деньги
+                if (age < 18) {
+                    gameState.money += 1000 + age * 200;
+                }
+                // IQ растёт с учёбой
+                if (gameState.education !== 'none') {
+                    gameState.iq = Math.min(200, gameState.iq + 5);
+                }
             },
-
-            showAd: function() {
-                if (ysdk) {
-                    ysdk.adv.showRewardedVideo({
-                        callbacks: {
-                            onRewarded: () => {
-                                const bonus = Math.floor(5000 * (1 + gameState.level * 0.2));
-                                gameState.money += bonus;
-                                gameState.totalEarned += bonus;
-                                gameState.happiness += 10;
-                                checkLevelUp();
-                                this.saveProgress();
-                                updateUI();
-                            }
-                        }
-                    });
+            
+            onEducationEnd: function() {
+                if (gameState.education === 'college') {
+                    unlockAchievement('ach_diploma');
+                    gameState.hasDiploma = true;
+                    gameState.career = 'worker';
+                    setEvent(currentLang === 'ru' ? '🎓 Колледж окончен! Первая работа!' : '🎓 College done! First job!');
+                } else if (gameState.education === 'university') {
+                    unlockAchievement('ach_diploma');
+                    gameState.hasDiploma = true;
+                    gameState.career = 'specialist';
+                    gameState.iq += 20;
+                    setEvent(currentLang === 'ru' ? '🎓 ВУЗ окончен! Ты специалист!' : '🎓 Uni done! You are a specialist!');
+                }
+            },
+            
+            getSalary: function() {
+                const base = {
+                    'worker': 30000,
+                    'specialist': 70000,
+                    'manager': 150000,
+                    'director': 400000,
+                    'ceo': 1000000
+                };
+                return base[gameState.career] || 0;
+            },
+            
+            showPathChoice: function() {
+                const t = translations[currentLang];
+                document.getElementById('modalTitle').innerText = t.modal_path_title;
+                document.getElementById('modalText').innerText = t.modal_path_text;
+                document.getElementById('modalButtons').innerHTML = `
+                    <button class="modal-btn" onclick="game.choosePath('college')">${t.path_college}</button>
+                    <button class="modal-btn" onclick="game.choosePath('university')">${t.path_university}</button>
+                    <button class="modal-btn" onclick="game.choosePath('work')">${t.path_work}</button>
+                `;
+                document.getElementById('pathModal').classList.add('show');
+            },
+            
+            choosePath: function(path) {
+                gameState.pathChosen = true;
+                document.getElementById('pathModal').classList.remove('show');
+                
+                if (path === 'college') {
+                    gameState.education = 'college';
+                    gameState.educationYearsLeft = 3;
+                    unlockAchievement('ach_college');
+                    setEvent(currentLang === 'ru' ? '🎓 Поступил в колледж!' : '🎓 Entered college!');
+                } else if (path === 'university') {
+                    gameState.education = 'university';
+                    gameState.educationYearsLeft = 5;
+                    unlockAchievement('ach_university');
+                    setEvent(currentLang === 'ru' ? '🎓 Поступил в институт!' : '🎓 Entered university!');
                 } else {
-                    const bonus = 5000;
-                    gameState.money += bonus;
-                    gameState.totalEarned += bonus;
-                    checkLevelUp();
-                    updateUI();
+                    gameState.career = 'worker';
+                    unlockAchievement('ach_first_job');
+                    setEvent(currentLang === 'ru' ? '💼 Пошёл работать!' : '💼 Started working!');
+                    this.showRentOffer();
+                }
+            },
+            
+            showRentOffer: function() {
+                const t = translations[currentLang];
+                document.getElementById('modalTitle').innerText = t.modal_rent_title;
+                document.getElementById('modalText').innerText = t.modal_rent_text;
+                document.getElementById('modalButtons').innerHTML = `
+                    <button class="modal-btn" onclick="game.rentFlat()">${t.rent_accept}</button>
+                    <button class="modal-btn" onclick="closeModal('pathModal')">${t.rent_later}</button>
+                `;
+                document.getElementById('pathModal').classList.add('show');
+            },
+            
+            rentFlat: function() {
+                if (gameState.money >= 30000) {
+                    gameState.money -= 30000;
+                    gameState.housing = 'rented';
+                    gameState.rentedFlat = true;
+                    unlockAchievement('ach_first_flat');
+                    setEvent(currentLang === 'ru' ? '🏠 Своя съёмная квартира!' : '🏠 Rented own flat!');
+                } else {
+                    setEvent(currentLang === 'ru' ? '❌ Не хватает денег!' : '❌ Not enough money!');
+                }
+                closeModal('pathModal');
+                updateUI();
+            },
+            
+            showAchievements: function() {
+                const list = document.getElementById('achievementsList');
+                list.innerHTML = '';
+                achievementsList.forEach(ach => {
+                    const unlocked = gameState.achievements.includes(ach.id);
+                    const t = translations[currentLang];
+                    const name = t[ach.id] || ach.id;
+                    const div = document.createElement('div');
+                    div.className = 'achievement-item' + (unlocked ? '' : ' locked');
+                    div.innerHTML = `<span class="achievement-emoji">${ach.emoji}</span><span>${unlocked ? name : '???'}</span>`;
+                    list.appendChild(div);
+                });
+                document.getElementById('achieveModal').classList.add('show');
+            },
+            
+            shareAchievements: function() {
+                const count = gameState.achievements.length;
+                const text = currentLang === 'ru'
+                    ? `🎮 VOMORG: Жизнь с нуля\n👤 ${gameState.name}\n🎂 Возраст: ${gameState.ageYears} лет\n💰 Капитал: ${gameState.money.toLocaleString()} ₽\n🏆 Достигнуто наград: ${count}/${achievements.length}\n\nСыграй и ты!`
+                    : `🎮 VOMORG: Life from Zero\n👤 ${gameState.name}\n🎂 Age: ${gameState.ageYears}\n💰 Capital: ${gameState.money.toLocaleString()} ₽\n🏆 Achievements: ${count}/${achievements.length}\n\nPlay now!`;
+                
+                if (navigator.share) {
+                    navigator.share({ title: 'VOMORG', text: text }).catch(() => {});
+                } else {
+                    navigator.clipboard.writeText(text).then(() => {
+                        showNotification(currentLang === 'ru' ? '📋 Скопировано!' : '📋 Copied!', 'success');
+                    });
                 }
             },
 
@@ -697,42 +1138,103 @@
                 if (player) {
                     player.setData(gameState);
                 } else {
-                    localStorage.setItem('lifeFromZeroSave', JSON.stringify(gameState));
+                    localStorage.setItem('vomorgSave', JSON.stringify(gameState));
                 }
             }
         };
+
+        function unlockAchievement(id) {
+            if (!gameState.achievements.includes(id)) {
+                gameState.achievements.push(id);
+                const ach = achievementsList.find(a => a.id === id);
+                if (ach) {
+                    const t = translations[currentLang];
+                    showNotification(`🏆 ${t[id] || id}`, 'success');
+                }
+            }
+        }
 
         function checkLevelUp() {
             let nextLevelXp = getXpForNextLevel(gameState.level);
             while (gameState.totalEarned >= nextLevelXp && gameState.level < 1000) {
                 gameState.level++;
-                gameState.happiness = Math.min(100, gameState.happiness + 5);
+                gameState.happiness = Math.min(100, gameState.happiness + 2);
                 nextLevelXp = getXpForNextLevel(gameState.level);
             }
+            
+            // Проверка особых достижений
+            if (gameState.career === 'manager' && !gameState.achievements.includes('ach_promotion')) {
+                unlockAchievement('ach_promotion');
+            }
+            if (gameState.money >= 1000000 && !gameState.achievements.includes('ach_millionaire')) {
+                unlockAchievement('ach_millionaire');
+                gameState.housing = 'mansion';
+            }
+            
+            // Покупка своей квартиры после работы
+            if (gameState.career !== 'none' && gameState.housing === 'parents' && gameState.ageYears >= 20) {
+                if (gameState.money >= 500000 && !gameState.rentedFlat) {
+                    gameState.money -= 500000;
+                    gameState.housing = 'own';
+                    unlockAchievement('ach_first_flat');
+                    setEvent(currentLang === 'ru' ? '🏠 Купил свою квартиру!' : '🏠 Bought own flat!');
+                }
+            }
+            
+            // Права в 18 лет
+            if (gameState.ageYears === 18 && !gameState.hasLicense && gameState.money >= 30000) {
+                gameState.money -= 30000;
+                gameState.hasLicense = true;
+                unlockAchievement('ach_license');
+                setEvent(currentLang === 'ru' ? '🚗 Получил водительские права!' : '🚗 Got driver license!');
+            }
+            
+            // Повышения по карьере
+            if (gameState.career === 'worker' && gameState.careerYears >= 3) {
+                gameState.career = 'specialist';
+                gameState.careerYears = 0;
+                setEvent(currentLang === 'ru' ? '📈 Повышение! Ты специалист!' : '📈 Promotion! You are a specialist!');
+            }
+            if (gameState.career === 'specialist' && gameState.careerYears >= 5) {
+                gameState.career = 'manager';
+                gameState.careerYears = 0;
+                unlockAchievement('ach_promotion');
+            }
+            if (gameState.career === 'manager' && gameState.careerYears >= 7) {
+                gameState.career = 'director';
+                gameState.careerYears = 0;
+            }
+            if (gameState.career === 'director' && gameState.careerYears >= 10) {
+                gameState.career = 'ceo';
+                gameState.careerYears = 0;
+            }
+            if (gameState.career !== 'none') gameState.careerYears++;
+        }
+
+        function setEvent(text) {
+            document.getElementById('eventText').innerText = text;
         }
 
         function updateUI() {
             const locale = currentLang === 'ru' ? 'ru-RU' : 'en-US';
-            document.getElementById('age').innerText = Math.floor(gameState.ageMonths / 12);
+            document.getElementById('age').innerText = gameState.ageYears;
             document.getElementById('money').innerText = Math.floor(gameState.money).toLocaleString(locale);
-            document.getElementById('energy').innerText = gameState.energy;
             document.getElementById('happiness').innerText = gameState.happiness;
+            document.getElementById('iq').innerText = gameState.iq;
             document.getElementById('level').innerText = gameState.level;
-            document.getElementById('levelTitle').innerText = `Уровень ${gameState.level}`;
+            document.getElementById('levelTitle').innerText = getLifeStage();
 
             const currentLevelXp = gameState.level === 1 ? 0 : getXpForNextLevel(gameState.level - 1);
             const nextLevelXp = getXpForNextLevel(gameState.level);
             const xpInRange = gameState.totalEarned - currentLevelXp;
             const xpNeededTotal = nextLevelXp - currentLevelXp;
             const percent = Math.min(100, Math.max(0, (xpInRange / xpNeededTotal) * 100));
-            
             document.getElementById('xpBar').style.width = percent + '%';
-            document.getElementById('xpNeeded').innerText = Math.max(0, Math.floor(nextLevelXp - gameState.totalEarned)).toLocaleString(locale);
 
-            const tapEarn = Math.floor(100 * (1 + gameState.level * 0.1));
-            document.getElementById('tapAmount').innerText = `+${tapEarn.toLocaleString(locale)} ₽`;
+            document.getElementById('characterEmoji').innerText = getCharacterEmoji();
+            document.getElementById('sceneLabel').innerText = getScene();
+            document.getElementById('charName').innerText = gameState.name;
 
-            // Потребности
             document.getElementById('hungerVal').innerText = gameState.hunger;
             document.getElementById('hungerBar').style.width = gameState.hunger + '%';
             document.getElementById('thirstVal').innerText = gameState.thirst;
@@ -743,16 +1245,26 @@
             document.getElementById('hygieneBar').style.width = gameState.hygiene + '%';
             document.getElementById('funVal').innerText = gameState.fun;
             document.getElementById('funBar').style.width = gameState.fun + '%';
+            
+            // Стоимость еды зависит от возраста
+            const age = gameState.ageYears;
+            const eatCost = age < 3 ? 0 : (age < 10 ? 100 : 200);
+            document.getElementById('eatCost').innerText = eatCost === 0 ? 'Бесплатно' : `-${eatCost}₽`;
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('show');
         }
 
         function showNotification(message, type = 'info') {
             const notif = document.getElementById('notification');
             notif.innerText = message;
             notif.className = 'notification show ' + type;
-            setTimeout(() => notif.classList.remove('show'), 3000);
+            setTimeout(() => notif.classList.remove('show'), 2500);
         }
 
-        window.addEventListener('blur', () => console.log('Game paused'));
+        window.addEventListener('blur', () => { if (requestTimer) clearInterval(requestTimer); });
+        window.addEventListener('focus', () => { if (gameState.name) startRequestSystem(); });
     </script>
 </body>
 </html>

@@ -17,8 +17,10 @@ canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1}
 .stage-name{font-size:28px;font-weight:900;background:linear-gradient(90deg,#00f5ff,#b026ff,#ff006e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:10px;text-shadow:0 0 40px rgba(0,245,255,0.6);letter-spacing:1px}
 .speech{font-size:15px;opacity:0.95;max-width:320px;margin:0 auto;padding:12px 16px;background:rgba(0,0,0,0.6);border-radius:15px;border:2px solid rgba(0,245,255,0.4);backdrop-filter:blur(15px);min-height:50px;box-shadow:0 0 25px rgba(0,245,255,0.3)}
 .bottom{bottom:0;left:0;right:0;padding:20px;display:flex;flex-direction:column;align-items:center;gap:12px}
-.tap-btn{width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,#00f5ff,#b026ff);border:4px solid rgba(255,255,255,0.4);color:#fff;font-size:18px;font-weight:900;cursor:pointer;box-shadow:0 0 60px rgba(0,245,255,0.7),inset 0 0 40px rgba(255,255,255,0.3);transition:transform 0.1s;animation:pulse 2s ease-in-out infinite;letter-spacing:2px}
-.tap-btn:active{transform:scale(0.9);animation:none}
+.tap-btn{width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,#00f5ff,#b026ff);border:4px solid rgba(255,255,255,0.4);color:#fff;font-size:18px;font-weight:900;cursor:pointer;box-shadow:0 0 60px rgba(0,245,255,0.7),inset 0 0 40px rgba(255,255,255,0.3);transition:transform 0.05s,box-shadow 0.1s;animation:pulse 2s ease-in-out infinite;letter-spacing:2px;touch-action:manipulation;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.tap-btn:active{transform:scale(0.92);animation:none;box-shadow:0 0 40px rgba(0,245,255,0.9),inset 0 0 30px rgba(255,255,255,0.4)}
+.tap-btn.alien{background:radial-gradient(circle,#39ff14,#00f5ff);border-color:rgba(57,255,20,0.6)}
+.tap-btn svg{width:100%;height:100%;position:absolute;top:0;left:0}
 @keyframes pulse{0%,100%{box-shadow:0 0 60px rgba(0,245,255,0.7)}50%{box-shadow:0 0 100px rgba(176,38,255,0.9)}}
 .progress{width:100%;max-width:450px;height:10px;background:rgba(255,255,255,0.1);border-radius:5px;overflow:hidden;border:1px solid rgba(255,255,255,0.2)}
 .progress-fill{height:100%;background:linear-gradient(90deg,#00f5ff,#b026ff,#ff006e);transition:width 0.3s;box-shadow:0 0 15px #00f5ff}
@@ -37,7 +39,7 @@ canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1}
 .modal-btn.share{background:linear-gradient(135deg,#39ff14,#00f5ff)}
 .notification{position:fixed;top:90px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.95);border:2px solid rgba(0,245,255,0.6);padding:14px 28px;border-radius:20px;opacity:0;transition:all 0.3s;pointer-events:none;z-index:200;font-size:14px;backdrop-filter:blur(15px);box-shadow:0 0 40px rgba(0,245,255,0.5);font-weight:600}
 .notification.show{opacity:1;top:100px}
-.settings-btn{position:fixed;top:10px;right:10px;width:40px;height:40px;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.3);border-radius:50%;color:#fff;font-size:20px;cursor:pointer;z-index:50;backdrop-filter:blur(15px);transition:all 0.3s}
+.settings-btn{position:fixed;top:60px;right:10px;width:40px;height:40px;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.3);border-radius:50%;color:#fff;font-size:20px;cursor:pointer;z-index:50;backdrop-filter:blur(15px);transition:all 0.3s}
 .settings-btn:hover{transform:rotate(180deg);background:rgba(255,255,255,0.25);box-shadow:0 0 20px rgba(0,245,255,0.5)}
 @media(min-width:768px){.tap-btn{width:180px;height:180px;font-size:22px}.stage-name{font-size:36px}.speech{font-size:18px;max-width:600px}.action-btn{padding:12px 22px;min-width:100px}.action-btn .icon{font-size:28px}.action-btn .label{font-size:13px}}
 </style>
@@ -56,7 +58,7 @@ canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1}
 </div>
 <div class="ui bottom">
 <div class="progress"><div class="progress-fill" id="progress" style="width:0%"></div></div>
-<button class="tap-btn" onclick="tap()">TAP</button>
+<button class="tap-btn" id="tapBtn" onclick="tap()">TAP</button>
 <div class="actions">
 <button class="action-btn" onclick="showAd()">
 <span class="icon">📺</span>
@@ -123,6 +125,7 @@ const canvas=document.getElementById('canvas');
 const ctx=canvas.getContext('2d');
 let particles=[];
 let gridOffset=0;
+let alienTimeout=null;
 function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight}
 window.addEventListener('resize',resize);
 resize();
@@ -239,10 +242,33 @@ ctx.lineTo(canvas.width,y);
 ctx.stroke();
 }
 }
+function showAlien(){
+const btn=document.getElementById('tapBtn');
+const t=T[state.lang];
+if(alienTimeout){clearTimeout(alienTimeout);alienTimeout=null}
+btn.classList.add('alien');
+btn.innerHTML=`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+<ellipse cx="50" cy="55" rx="35" ry="40" fill="#39ff14" opacity="0.9"/>
+<ellipse cx="50" cy="55" rx="35" ry="40" fill="none" stroke="#00f5ff" stroke-width="2"/>
+<ellipse cx="35" cy="50" rx="12" ry="15" fill="#000"/>
+<ellipse cx="65" cy="50" rx="12" ry="15" fill="#000"/>
+<ellipse cx="37" cy="47" rx="4" ry="5" fill="#fff"/>
+<ellipse cx="67" cy="47" rx="4" ry="5" fill="#fff"/>
+<path d="M 40 75 Q 50 80 60 75" stroke="#000" stroke-width="2" fill="none" stroke-linecap="round"/>
+<line x1="50" y1="15" x2="50" y2="5" stroke="#00f5ff" stroke-width="2"/>
+<circle cx="50" cy="3" r="3" fill="#ff006e"/>
+</svg>`;
+alienTimeout=setTimeout(()=>{
+btn.classList.remove('alien');
+btn.innerHTML=t.tap;
+alienTimeout=null;
+},300);
+}
 function tap(){
 initAudio();
 state.taps++;
 playTap();
+showAlien();
 const cx=canvas.width/2;
 const cy=canvas.height/2;
 const color=COLORS[state.stage];

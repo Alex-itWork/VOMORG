@@ -1,1009 +1,350 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Life Simulator</title>
-    <script src="https://yandex.ru/games/sdk/v2"></script>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { width: 100%; height: 100%; overflow: hidden; }
-        
-        :root {
-            --neon-pink: #ff006e;
-            --neon-blue: #00f5ff;
-            --neon-purple: #b026ff;
-            --neon-green: #39ff14;
-            --neon-yellow: #ffea00;
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-        }
-        
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-            background-size: 400% 400%;
-            animation: bgGradient 15s ease infinite;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            user-select: none;
-            -webkit-user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            position: relative;
-            transition: background 1s ease;
-        }
-        
-        @keyframes bgGradient {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-        
-        .particles {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 1;
-            overflow: hidden;
-        }
-        .particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: var(--neon-blue);
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--neon-blue);
-            animation: floatParticle 20s linear infinite;
-            opacity: 0.6;
-        }
-        @keyframes floatParticle {
-            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
-            10% { opacity: 0.6; }
-            90% { opacity: 0.6; }
-            100% { transform: translateY(-100px) translateX(100px); opacity: 0; }
-        }
-        
-        .settings-btn {
-            position: fixed;
-            top: 8px;
-            right: 8px;
-            width: 32px;
-            height: 32px;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 50%;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            z-index: 100;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s;
-            box-shadow: 0 0 15px rgba(0, 245, 255, 0.3);
-        }
-        .settings-btn:hover {
-            transform: rotate(180deg) scale(1.1);
-            box-shadow: 0 0 25px var(--neon-blue);
-        }
-        
-        #loadingScreen {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #0f0c29, #302b63);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: bold;
-            color: white;
-            z-index: 999;
-            transition: opacity 0.5s;
-            text-shadow: 0 0 20px var(--neon-blue);
-        }
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid rgba(255,255,255,0.1);
-            border-top-color: var(--neon-blue);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-right: 15px;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        
-        #characterCreation {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #0f0c29, #302b63);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            z-index: 998;
-            padding: 15px;
-        }
-        .creation-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(176, 38, 255, 0.3);
-            max-width: 380px;
-            width: 100%;
-            animation: cardAppear 0.6s ease-out;
-        }
-        @keyframes cardAppear {
-            from { transform: scale(0.8); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-        .creation-card h2 {
-            margin-bottom: 12px;
-            background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-size: 22px;
-            text-align: center;
-            font-weight: 900;
-        }
-        .creation-card p { text-align: center; margin-bottom: 15px; font-size: 13px; opacity: 0.8; }
-        .gender-options {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-bottom: 15px;
-        }
-        .gender-btn {
-            background: rgba(255,255,255,0.05);
-            border: 2px solid rgba(255,255,255,0.2);
-            padding: 12px 6px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
-            font-size: 11px;
-            color: white;
-            backdrop-filter: blur(10px);
-        }
-        .gender-btn:hover {
-            transform: translateY(-3px);
-            border-color: var(--neon-blue);
-            box-shadow: 0 8px 20px rgba(0, 245, 255, 0.3);
-        }
-        .gender-btn.selected {
-            border-color: var(--neon-pink);
-            background: rgba(255, 0, 110, 0.2);
-            box-shadow: 0 0 25px rgba(255, 0, 110, 0.5);
-        }
-        .gender-emoji { font-size: 32px; display: block; margin-bottom: 4px; }
-        .name-input {
-            width: 100%;
-            padding: 10px;
-            background: rgba(255,255,255,0.1);
-            border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 10px;
-            font-size: 14px;
-            margin-bottom: 12px;
-            color: white;
-            outline: none;
-            transition: all 0.3s;
-        }
-        .name-input:focus {
-            border-color: var(--neon-blue);
-            box-shadow: 0 0 15px rgba(0, 245, 255, 0.3);
-        }
-        .name-input::placeholder { color: rgba(255,255,255,0.5); }
-        .start-btn {
-            width: 100%;
-            background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 8px 25px rgba(255, 0, 110, 0.4);
-        }
-        .start-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 35px rgba(255, 0, 110, 0.6);
-        }
-        .start-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        /* КОМПАКТНАЯ ШАПКА - все ресурсы вверху */
-        .top-bar {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--glass-border);
-            padding: 6px 10px;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 5px;
-            font-size: 11px;
-            font-weight: 600;
-            z-index: 10;
-            position: relative;
-        }
-        .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 3px;
-            background: rgba(255,255,255,0.05);
-            padding: 4px 6px;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .level-bar-container {
-            grid-column: span 4;
-            background: rgba(255,255,255,0.1);
-            border-radius: 8px;
-            height: 10px;
-            overflow: hidden;
-            margin-top: 3px;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        .level-bar-fill {
-            background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple), var(--neon-blue));
-            background-size: 200% 100%;
-            height: 100%;
-            width: 0%;
-            transition: width 0.4s;
-            box-shadow: 0 0 12px var(--neon-pink);
-            animation: barShine 3s linear infinite;
-        }
-        @keyframes barShine {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 200% 50%; }
-        }
-        .level-text {
-            grid-column: span 4;
-            font-size: 10px;
-            opacity: 0.8;
-            text-align: center;
-            margin-top: 2px;
-        }
-
-        /* КОМПАКТНЫЕ ПОТРЕБНОСТИ */
-        .needs-bar {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--glass-border);
-            padding: 5px 8px;
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 4px;
-            font-size: 9px;
-            z-index: 10;
-            position: relative;
-        }
-        .need-item { text-align: center; }
-        .need-bar {
-            background: rgba(255,255,255,0.1);
-            border-radius: 4px;
-            height: 6px;
-            margin-top: 2px;
-            overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.15);
-        }
-        .need-fill { height: 100%; transition: width 0.3s; box-shadow: 0 0 6px currentColor; }
-        .need-fill.hunger { background: linear-gradient(90deg, #ff6b00, #ffaa00); color: #ffaa00; }
-        .need-fill.thirst { background: linear-gradient(90deg, #0099ff, #00ddff); color: #00ddff; }
-        .need-fill.energy { background: linear-gradient(90deg, #00ff88, #39ff14); color: #39ff14; }
-        .need-fill.hygiene { background: linear-gradient(90deg, #b026ff, #ff00aa); color: #ff00aa; }
-        .need-fill.fun { background: linear-gradient(90deg, #ff006e, #ff00aa); color: #ff006e; }
-        
-        /* КОМПАКТНЫЕ ДОП СТАТЫ */
-        .extra-stats {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--glass-border);
-            padding: 4px 8px;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 4px;
-            font-size: 9px;
-            z-index: 10;
-            position: relative;
-        }
-        .extra-stat {
-            text-align: center;
-            font-weight: 600;
-            background: rgba(255,255,255,0.05);
-            padding: 3px;
-            border-radius: 6px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        /* ЦЕНТРАЛЬНЫЙ ЭКРАН - персонаж зафиксирован */
-        .main-screen {
-            flex: 1;
-            padding: 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            min-height: 0;
-            z-index: 5;
-            overflow: hidden;
-        }
-        .scene-visual {
-            width: 100%;
-            max-width: 400px;
-            height: 100%;
-            max-height: 400px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 2px solid var(--glass-border);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            padding: 15px;
-            flex-direction: column;
-            box-shadow: 0 15px 50px rgba(0,0,0,0.3), inset 0 0 30px rgba(176, 38, 255, 0.1);
-            transition: all 0.5s;
-        }
-        
-        /* ПЕРСОНАЖ ЗАФИКСИРОВАН И ВИДЕН ЦЕЛИКОМ */
-        .character-container {
-            width: 160px;
-            height: 240px;
-            position: relative;
-            margin: 8px 0;
-            filter: drop-shadow(0 0 15px rgba(0, 245, 255, 0.5));
-            animation: charFloat 3s ease-in-out infinite;
-            flex-shrink: 0;
-        }
-        @keyframes charFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
-        }
-        .character-svg {
-            width: 100%;
-            height: 100%;
-        }
-        .char-arm-left {
-            transform-origin: 50px 90px;
-            animation: armSwingLeft 1.5s ease-in-out infinite;
-        }
-        .char-arm-right {
-            transform-origin: 130px 90px;
-            animation: armSwingRight 1.5s ease-in-out infinite;
-        }
-        .char-leg-left {
-            transform-origin: 75px 180px;
-            animation: legSwingLeft 1.5s ease-in-out infinite;
-        }
-        .char-leg-right {
-            transform-origin: 105px 180px;
-            animation: legSwingRight 1.5s ease-in-out infinite;
-        }
-        @keyframes armSwingLeft {
-            0%, 100% { transform: rotate(-15deg); }
-            50% { transform: rotate(20deg); }
-        }
-        @keyframes armSwingRight {
-            0%, 100% { transform: rotate(15deg); }
-            50% { transform: rotate(-20deg); }
-        }
-        @keyframes legSwingLeft {
-            0%, 100% { transform: rotate(-10deg); }
-            50% { transform: rotate(15deg); }
-        }
-        @keyframes legSwingRight {
-            0%, 100% { transform: rotate(10deg); }
-            50% { transform: rotate(-15deg); }
-        }
-        
-        .character-name {
-            font-size: 14px;
-            font-weight: bold;
-            background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 3px;
-            text-shadow: 0 0 15px rgba(255, 0, 110, 0.5);
-        }
-        
-        .request-bubble {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: linear-gradient(135deg, var(--neon-yellow), #ff9500);
-            border-radius: 15px;
-            padding: 8px 12px;
-            font-size: 10px;
-            box-shadow: 0 0 20px rgba(255, 234, 0, 0.6);
-            animation: bubbleShake 0.6s ease-in-out infinite;
-            max-width: 130px;
-            text-align: center;
-            font-weight: 700;
-            color: #000;
-            z-index: 20;
-        }
-        @keyframes bubbleShake {
-            0%, 100% { transform: translateY(0) rotate(0) scale(1); }
-            25% { transform: translateY(-3px) rotate(-2deg) scale(1.03); }
-            75% { transform: translateY(-3px) rotate(2deg) scale(1.03); }
-        }
-        
-        .speech-bubble {
-            position: absolute;
-            top: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: white;
-            border: 2px solid var(--neon-pink);
-            border-radius: 15px;
-            padding: 6px 12px;
-            font-size: 11px;
-            box-shadow: 0 0 20px rgba(255, 0, 110, 0.6);
-            max-width: 160px;
-            text-align: center;
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-            color: #000;
-            font-weight: 600;
-            z-index: 30;
-        }
-        .speech-bubble.show { opacity: 1; animation: speechPop 0.5s ease-out; }
-        @keyframes speechPop {
-            0% { transform: translateX(-50%) scale(0); }
-            50% { transform: translateX(-50%) scale(1.2); }
-            100% { transform: translateX(-50%) scale(1); }
-        }
-        .speech-bubble::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0; height: 0;
-            border-left: 8px solid transparent;
-            border-right: 8px solid transparent;
-            border-top: 10px solid white;
-        }
-        
-        .scene-label {
-            font-size: 11px;
-            color: rgba(255,255,255,0.9);
-            font-weight: 600;
-            margin-top: 5px;
-            background: rgba(0,0,0,0.3);
-            padding: 4px 10px;
-            border-radius: 12px;
-            backdrop-filter: blur(10px);
-        }
-        
-        .event-text {
-            font-size: 12px;
-            line-height: 1.4;
-            color: white;
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            padding: 8px 12px;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-            margin: 6px 0;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-        }
-        
-        .tap-button {
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
-            border: 3px solid white;
-            color: white;
-            font-size: 13px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 0 30px rgba(255, 0, 110, 0.7), inset 0 0 15px rgba(255,255,255,0.2);
-            transition: transform 0.1s;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            animation: tapShake 1s ease-in-out infinite;
-            margin: 6px 0;
-        }
-        .tap-button.show { display: flex; }
-        .tap-button:active {
-            transform: scale(0.9) rotate(15deg);
-            animation: none;
-        }
-        @keyframes tapShake {
-            0%, 100% { transform: rotate(0) scale(1); }
-            15% { transform: rotate(-10deg) scale(1.08); }
-            30% { transform: rotate(10deg) scale(1.08); }
-            45% { transform: rotate(-6deg) scale(1.04); }
-            60% { transform: rotate(6deg) scale(1.04); }
-            75% { transform: rotate(-3deg) scale(1.02); }
-        }
-        .tap-amount { font-size: 9px; opacity: 0.9; margin-top: 2px; }
-
-        /* КОМПАКТНЫЕ КНОПКИ ДЕЙСТВИЙ */
-        .actions-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid var(--glass-border);
-            padding: 6px;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 5px;
-            z-index: 10;
-            position: relative;
-        }
-        .action-btn {
-            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
-            color: white;
-            border: 1px solid rgba(255,255,255,0.3);
-            padding: 8px 3px;
-            border-radius: 10px;
-            font-size: 10px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-            touch-action: manipulation;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 2px;
-            box-shadow: 0 4px 15px rgba(0, 245, 255, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-        .action-btn::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            transition: left 0.5s;
-        }
-        .action-btn:hover::before { left: 100%; }
-        .action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 245, 255, 0.5);
-        }
-        .action-btn:active { transform: scale(0.95); }
-        .action-btn span.subtext { font-size: 8px; font-weight: 400; opacity: 0.9; }
-        .action-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-        .btn-next { grid-column: span 3; background: linear-gradient(135deg, #2196F3, #1976D2); }
-        .btn-ad { background: linear-gradient(135deg, var(--neon-yellow), #ff9500); color: #000; }
-        .btn-achieve { background: linear-gradient(135deg, #ffd700, #ff8c00); color: #000; }
-
-        .modal {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(10px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 200;
-            padding: 15px;
-        }
-        .modal.show { display: flex; }
-        .modal-content {
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            border: 2px solid var(--glass-border);
-            padding: 20px;
-            border-radius: 20px;
-            max-width: 400px;
-            width: 100%;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(176, 38, 255, 0.3);
-            max-height: 85vh;
-            overflow-y: auto;
-            color: white;
-        }
-        .modal-content h3 {
-            background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 12px;
-            font-size: 20px;
-        }
-        .modal-content p { margin-bottom: 12px; line-height: 1.5; opacity: 0.9; }
-        .modal-btn {
-            background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
-            color: white;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: bold;
-            cursor: pointer;
-            margin: 4px;
-            transition: all 0.3s;
-            box-shadow: 0 5px 20px rgba(255, 0, 110, 0.4);
-        }
-        .modal-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(255, 0, 110, 0.6); }
-        
-        .settings-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            margin: 8px 0;
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .settings-row input[type="range"] { width: 100px; accent-color: var(--neon-pink); }
-        .settings-row select {
-            padding: 5px 8px;
-            border-radius: 6px;
-            background: rgba(255,255,255,0.1);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.2);
-            font-size: 12px;
-        }
-        .toggle-switch {
-            position: relative;
-            width: 45px;
-            height: 24px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 12px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        .toggle-switch.on { background: var(--neon-green); box-shadow: 0 0 12px var(--neon-green); }
-        .toggle-switch::after {
-            content: '';
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 20px;
-            height: 20px;
-            background: white;
-            border-radius: 50%;
-            transition: left 0.3s;
-        }
-        .toggle-switch.on::after { left: 23px; }
-        
-        .achievements-list {
-            max-height: 300px;
-            overflow-y: auto;
-            text-align: left;
-            margin: 12px 0;
-        }
-        .achievement-item {
-            padding: 8px;
-            margin: 5px 0;
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 12px;
-            border: 1px solid rgba(255,255,255,0.1);
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-        .achievement-item:not(.locked):hover {
-            background: rgba(255,255,255,0.1);
-            transform: translateX(4px);
-            border-color: var(--neon-blue);
-        }
-        .achievement-item.locked { opacity: 0.35; cursor: not-allowed; }
-        .achievement-emoji { font-size: 24px; }
-        
-        .notification {
-            position: fixed;
-            top: 60px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, rgba(0,0,0,0.9), rgba(30,30,60,0.9));
-            color: white;
-            padding: 12px 20px;
-            border-radius: 15px;
-            opacity: 0;
-            transition: all 0.3s;
-            pointer-events: none;
-            z-index: 300;
-            font-size: 13px;
-            text-align: center;
-            max-width: 90%;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            border: 1px solid var(--glass-border);
-            backdrop-filter: blur(20px);
-        }
-        .notification.show { opacity: 1; top: 70px; }
-        .notification.warning { border-color: var(--neon-yellow); box-shadow: 0 0 25px rgba(255, 234, 0, 0.5); }
-        .notification.success { border-color: var(--neon-green); box-shadow: 0 0 25px rgba(57, 255, 20, 0.5); }
-        .notification.love { border-color: var(--neon-pink); box-shadow: 0 0 25px rgba(255, 0, 110, 0.5); }
-        
-        .floating-number {
-            position: absolute;
-            font-size: 20px;
-            font-weight: bold;
-            color: var(--neon-green);
-            pointer-events: none;
-            animation: floatUp 1s ease-out forwards;
-            text-shadow: 0 0 12px var(--neon-green), 0 0 20px var(--neon-green);
-            z-index: 100;
-        }
-        @keyframes floatUp {
-            0% { opacity: 1; transform: translateY(0) scale(1); }
-            100% { opacity: 0; transform: translateY(-80px) scale(1.3); }
-        }
-        
-        /* ПК ВЕРСИЯ - персонаж виден целиком */
-        @media (min-width: 1200px) {
-            .top-bar { font-size: 16px; padding: 10px 20px; }
-            .needs-bar { font-size: 13px; padding: 8px 15px; }
-            .extra-stats { font-size: 13px; padding: 6px 15px; }
-            
-            /* Увеличиваем сцену чтобы персонаж был виден полностью */
-            .scene-visual { 
-                max-width: 700px;
-                max-height: 600px;
-            }
-            
-            /* Персонаж крупнее */
-            .character-container { 
-                width: 240px; 
-                height: 360px; 
-            }
-            
-            .event-text { font-size: 18px; padding: 15px; max-width: 700px; }
-            .action-btn { font-size: 16px; padding: 12px 6px; }
-            .request-bubble { font-size: 14px; padding: 10px 15px; }
-            .tap-button { width: 140px; height: 140px; font-size: 18px; }
-            .character-name { font-size: 20px; }
-            .scene-label { font-size: 15px; padding: 6px 14px; }
-            
-            /* Горизонтальный layout для ПК */
-            .main-screen {
-                flex-direction: row;
-                justify-content: center;
-                align-items: center;
-                gap: 25px;
-                padding: 15px 30px;
-            }
-            
-            .scene-visual { flex: 1; max-width: 55%; }
-            .event-text { flex: 1; max-width: 40%; margin: 0; }
-        }
-        
-        /* Маленькие мобилки */
-        @media (max-width: 360px) {
-            .character-container { width: 130px; height: 195px; }
-            .action-btn { font-size: 9px; padding: 7px 2px; }
-            .gender-emoji { font-size: 26px; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>QUANTUM</title>
+<script src="https://yandex.ru/games/sdk/v2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;font-family:system-ui,-apple-system,sans-serif;background:#000;color:#fff;user-select:none;-webkit-user-select:none}
+canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1}
+.ui{position:fixed;z-index:10;pointer-events:none}
+.ui>*{pointer-events:auto}
+.top{top:0;left:0;right:0;padding:8px;background:rgba(0,0,0,0.7);backdrop-filter:blur(10px);display:flex;justify-content:space-between;align-items:center;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.1)}
+.stat{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.05);padding:4px 8px;border-radius:8px}
+.stage{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
+.stage-name{font-size:24px;font-weight:900;background:linear-gradient(90deg,#00f5ff,#b026ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px;text-shadow:0 0 30px rgba(0,245,255,0.5)}
+.speech{font-size:14px;opacity:0.9;max-width:300px;margin:0 auto;padding:10px;background:rgba(0,0,0,0.5);border-radius:12px;border:1px solid rgba(255,255,255,0.2);backdrop-filter:blur(10px);min-height:40px}
+.bottom{bottom:0;left:0;right:0;padding:15px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.tap-btn{width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,#00f5ff,#b026ff);border:3px solid rgba(255,255,255,0.3);color:#fff;font-size:16px;font-weight:900;cursor:pointer;box-shadow:0 0 50px rgba(0,245,255,0.6),inset 0 0 30px rgba(255,255,255,0.2);transition:transform 0.1s;animation:pulse 2s ease-in-out infinite}
+.tap-btn:active{transform:scale(0.9);animation:none}
+@keyframes pulse{0%,100%{box-shadow:0 0 50px rgba(0,245,255,0.6)}50%{box-shadow:0 0 80px rgba(176,38,255,0.8)}}
+.progress{width:100%;max-width:400px;height:8px;background:rgba(255,255,255,0.1);border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#00f5ff,#b026ff);transition:width 0.3s;box-shadow:0 0 10px #00f5ff}
+.actions{display:flex;gap:8px}
+.action-btn{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;padding:8px 16px;border-radius:10px;font-size:12px;cursor:pointer;backdrop-filter:blur(10px);transition:all 0.2s}
+.action-btn:hover{background:rgba(255,255,255,0.2);transform:translateY(-2px)}
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);backdrop-filter:blur(20px);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+.modal.show{display:flex}
+.modal-content{background:linear-gradient(135deg,#0f0c29,#302b63);border:2px solid rgba(255,255,255,0.2);padding:30px;border-radius:20px;max-width:400px;width:100%;text-align:center;box-shadow:0 0 60px rgba(0,245,255,0.3)}
+.modal-content h2{background:linear-gradient(90deg,#00f5ff,#b026ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:15px;font-size:24px}
+.modal-content p{margin-bottom:20px;line-height:1.6;opacity:0.9}
+.modal-btn{background:linear-gradient(135deg,#00f5ff,#b026ff);color:#fff;border:none;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;margin:5px;transition:all 0.3s;box-shadow:0 0 20px rgba(0,245,255,0.4)}
+.modal-btn:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(0,245,255,0.6)}
+.notification{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.9);border:1px solid rgba(0,245,255,0.5);padding:12px 24px;border-radius:15px;opacity:0;transition:all 0.3s;pointer-events:none;z-index:200;font-size:13px;backdrop-filter:blur(10px);box-shadow:0 0 30px rgba(0,245,255,0.4)}
+.notification.show{opacity:1;top:90px}
+.settings-btn{position:fixed;top:8px;right:8px;width:36px;height:36px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:50%;color:#fff;font-size:18px;cursor:pointer;z-index:50;backdrop-filter:blur(10px);transition:all 0.3s}
+.settings-btn:hover{transform:rotate(180deg);background:rgba(255,255,255,0.2)}
+@media(min-width:768px){.tap-btn{width:150px;height:150px;font-size:20px}.stage-name{font-size:32px}.speech{font-size:16px;max-width:500px}}
+</style>
 </head>
 <body>
-
-    <div class="particles" id="particles"></div>
-    <button class="settings-btn" onclick="openSettings()">⚙️</button>
-
-    <div id="loadingScreen">
-        <div class="loading-spinner"></div>
-        <span id="loadingText">Загрузка...</span>
-    </div>
-
-    <div id="characterCreation">
-        <div class="creation-card">
-            <h2 data-i18n="creation_title">Создай персонажа</h2>
-            <p data-i18n="creation_desc">Выбери пол и имя</p>
-            
-            <div class="gender-options">
-                <div class="gender-btn" data-gender="male" onclick="selectGender('male')">
-                    <span class="gender-emoji">👨</span>
-                    <span data-i18n="gender_male">М</span>
-                </div>
-                <div class="gender-btn" data-gender="female" onclick="selectGender('female')">
-                    <span class="gender-emoji">👩</span>
-                    <span data-i18n="gender_female">Ж</span>
-                </div>
-                <div class="gender-btn" data-gender="humanoid" onclick="selectGender('humanoid')">
-                    <span class="gender-emoji">🤖</span>
-                    <span data-i18n="gender_humanoid">Гум</span>
-                </div>
-            </div>
-            
-            <input type="text" class="name-input" id="nameInput" placeholder="Имя" maxlength="15">
-            <button class="start-btn" id="startBtn" onclick="startGame()" disabled data-i18n="start_game">Родить 🍼</button>
-        </div>
-    </div>
-
-    <div class="top-bar" id="gameUI" style="display: none;">
-        <div class="stat-item">🎂 <span id="age">0</span></div>
-        <div class="stat-item">💰 <span id="money">0</span>₽</div>
-        <div class="stat-item">😊 <span id="happiness">80</span>%</div>
-        <div class="stat-item">❤️ <span id="bond">0</span>%</div>
-        
-        <div class="level-bar-container">
-            <div class="level-bar-fill" id="xpBar"></div>
-        </div>
-        <div class="level-text"><span data-i18n="level_prefix">Ур.</span> <span id="level">1</span> · <span id="levelTitle">Младенец</span></div>
-    </div>
-
-    <div class="needs-bar" id="needsBar" style="display: none;">
-        <div class="need-item">
-            <div>🍔<span id="hungerVal">100</span></div>
-            <div class="need-bar"><div class="need-fill hunger" id="hungerBar" style="width: 100%"></div></div>
-        </div>
-        <div class="need-item">
-            <div>💧<span id="thirstVal">100</span></div>
-            <div class="need-bar"><div class="need-fill thirst" id="thirstBar" style="width: 100%"></div></div>
-        </div>
-        <div class="need-item">
-            <div>😴<span id="sleepVal">100</span></div>
-            <div class="need-bar"><div class="need-fill energy" id="sleepBar" style="width: 100%"></div></div>
-        </div>
-        <div class="need-item">
-            <div>🚿<span id="hygieneVal">100</span></div>
-            <div class="need-bar"><div class="need-fill hygiene" id="hygieneBar" style="width: 100%"></div></div>
-        </div>
-        <div class="need-item">
-            <div>🎮<span id="funVal">100</span></div>
-            <div class="need-bar"><div class="need-fill fun" id="funBar" style="width: 100%"></div></div>
-        </div>
-    </div>
-    
-    <div class="extra-stats" id="extraStats" style="display: none;">
-        <div class="extra-stat">🧠<span id="iqStat">50</span></div>
-        <div class="extra-stat">💪<span id="strStat">10</span></div>
-        <div class="extra-stat">🏃<span id="staStat">10</span></div>
-        <div class="extra-stat">📚<span id="mindStat">10</span></div>
-    </div>
-
-    <div class="main-screen" id="mainScreen" style="display: none;">
-        <div class="scene-visual" id="sceneVisual">
-            <div class="request-bubble" id="requestBubble" style="display: none;"></div>
-            <div class="speech-bubble" id="speechBubble"></div>
-            <div class="character-name" id="charName">Малыш</div>
-            
-            <div class="character-container">
-                <svg class="character-svg" viewBox="0 0 180 260" xmlns="http://www.w3.org/2000/svg">
-                    <ellipse cx="90" cy="250" rx="50" ry="8" fill="rgba(0,0,0,0.3)"/>
-                    
-                    <g class="char-leg-left">
-                        <rect x="68" y="180" width="18" height="60" rx="9" fill="#2c3e50" stroke="#000" stroke-width="2"/>
-                        <ellipse cx="77" cy="242" rx="12" ry="6" fill="#1a1a1a"/>
-                    </g>
-                    
-                    <g class="char-leg-right">
-                        <rect x="94" y="180" width="18" height="60" rx="9" fill="#2c3e50" stroke="#000" stroke-width="2"/>
-                        <ellipse cx="103" cy="242" rx="12" ry="6" fill="#1a1a1a"/>
-                    </g>
-                    
-                    <rect id="charBody" x="55" y="90" width="70" height="95" rx="15" fill="url(#bodyGradient)" stroke="#000" stroke-width="2"/>
-                    
-                    <g class="char-arm-left">
-                        <rect x="38" y="95" width="18" height="65" rx="9" fill="#ffdbac" stroke="#000" stroke-width="2"/>
-                        <circle cx="47" cy="162" r="9" fill="#ffdbac" stroke="#000" stroke-width="2"/>
-                    </g>
-                    
-                    <g class="char-arm-right">
-                        <rect x="124" y="95" width="18" height="65" rx="9" fill="#ffdbac" stroke="#000" stroke-width="2"/>
-                        <circle cx="133" cy="162" r="9" fill="#ffdbac" stroke="#000" stroke-width="2"/>
-                    </g>
-                    
-                    <circle cx="90" cy="55" r="40" fill="#ffdbac" stroke="#000" stroke-width="2"/>
-                    
-                    <path id="charHair" d="M 50 50 Q 50 15 90 15 Q 130 15 130 50 Q 130 35 90 30 Q 50 35 50 50 Z" fill="#4a2c1a"/>
-                    
-                    <circle id="eyeLeft" cx="75" cy="55" r="5" fill="#000"/>
-                    <circle id="eyeRight" cx="105" cy="55" r="5" fill="#000"/>
-                    <circle cx="76" cy="53" r="1.5" fill="#fff"/>
-                    <circle cx="106" cy="53" r="1.5" fill="#fff"/>
-                    
-                    <path id="charMouth" d="M 75 75 Q 90 85 105 75" stroke="#000" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-                    
-                    <defs>
-                        <linearGradient id="bodyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color:#4a90e2"/>
-                            <stop offset="100%" style="stop-color:#357abd"/>
-                        </linearGradient>
-                    </defs>
-                </svg>
-            </div>
-            
-            <button class="tap-button" id="tapButton" onclick="game.tap()">
-                <span>👆 ТАПАЙ</span>
-                <span class="tap-amount" id="tapAmount">+50₽</span>
-            </button>
-            
-            <div class="scene-label" id="sceneLabel">🏠 Дома</div>
-        </div>
-        <div class="event-text" id="eventText" data-i18n="start_event">
-            Ты только что родился! Покорми меня! 🍼
-        </div>
-    </div>
-
-    <div class="actions-panel" id="actionsPanel" style="display: none;">
-        <button class="action-btn" onclick="game.action('eat')">
-            🍔 <span data-i18n="btn_eat">Поесть</span>
-            <span class="subtext" id="eatCost">-50₽</span>
-        </button>
-        <button class="action-btn" onclick="game.action('drink')">
-            💧 <span data-i18n="btn_drink">Попить</span>
-            <span class="subtext">-20₽</span>
-        </button>
-        <button class="action-btn" onclick="game.action('sleep')">
-            😴 <span data-i18n="btn_sleep">Спать</span>
-        </button>
-        <button class="action-btn" onclick="game.action('clean')">
-            🚿 <span data-i18n="btn_clean">Помыть</span>
-        </button>
-        <button class="action-btn" onclick="game.action('play')">
-            🎮 <span data-i18n="btn_play">Играть</span>
-        </button>
-        <button class="action-btn btn-achieve" onclick="game.showAchievements()">
-            🏆 <span data-i18n="btn_achieve">Награды</span>
-        </button>
-        <button class="action-btn btn-next" onclick="game.nextMonth()">
-            ⏭ <span data-i18n="btn_next">Следующий месяц</span>
-        </button>
-    </div>
-
-    <div class="modal" id="pathModal">
-        <div class="modal-content">
-            <h3 id="modalTitle">Выбери свой путь!</h3>
-            <p id="modalText">Тебе 15 лет. Куда пойдёшь?</p>
-            <div id="modalButtons"></div>
-        </div>
-    </div>
-
-    <div class="modal" id="achieveModal">
-        <div class="modal-content">
-            <h3>🏆 <span data-i18n="achieve_title">Достижения</span></h3>
-            <div class="achievements-list" id="achievementsList"></div>
-            <button class="modal-btn" onclick="game.shareAchievements()" data-i18n="share">Поделиться</button>
-            <button class="modal-btn" onclick="closeModal('achieveModal')" data-i18n="close">Закрыть</button>
-        </div>
-    </div>
-    
-    <div class="modal" id="settingsModal">
-        <div class="modal-content">
-            <h3>⚙️ <span data-i18n="settings">Настройки</span></h3>
-            <div class="settings-row">
-                <span>🔊 <span data-i18n="music">Музыка</span></span>
-                <input type="range" id="musicVolume" min="0" max="100" value="30" oninput="setMusicVolume(this.value)">
-            </div>
-            <div class="settings-row">
-                <span>🎵 <span data-i18n="sfx">Звуки</span></span>
-                <input type="range" id="sfxVolume" min="0" max="100" value="70" oninput="setSfxVolume(this.value)">
-            </div>
-            <div class="settings-row">
-                <span>📳 <span data-i18n="vibration">Вибрация</span></span>
-                <div class="toggle-switch on" id="vibrationToggle" onclick="toggleVibration()"></div>
-            </div>
-            <div class="settings-row">
-                <span>🌍 <span data-i18n="language">Язык</span></span>
-                <select id="languageSelect" onchange="changeLanguage(this.value)">
-                    <option value="ru">Русский</option>
-                    <option value="en">English</option>
-                </select>
-            </div>
-            <button class="modal-btn" onclick="closeModal('settingsModal')" data-i18n="close">Закрыть</button>
-        </div>
-    </div>
-
-    <div class="notification" id="notification"></div>
-
-    <script>
-        // Код JavaScript остаётся таким же, как в предыдущей версии
-        // (весь JS-код из предыдущего ответа)
-        
-        // ... (весь JavaScript код из предыдущей версии остаётся без изменений)
-    </script>
+<canvas id="canvas"></canvas>
+<button class="settings-btn" onclick="openSettings()">⚙️</button>
+<div class="ui top">
+<div class="stat">⚡<span id="energy">0</span></div>
+<div class="stat">🌟<span id="taps">0</span></div>
+<div class="stat">🎯<span id="stage">1</span>/10</div>
+</div>
+<div class="ui stage">
+<div class="stage-name" id="stageName">Quantum Spark</div>
+<div class="speech" id="speech">Tap to create energy...</div>
+</div>
+<div class="ui bottom">
+<div class="progress"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+<button class="tap-btn" onclick="tap()">TAP</button>
+<div class="actions">
+<button class="action-btn" onclick="showAd()">📺 Ad x2</button>
+<button class="action-btn" onclick="showAchievements()">🏆</button>
+</div>
+</div>
+<div class="modal" id="achieveModal">
+<div class="modal-content">
+<h2>🏆 Achievements</h2>
+<div id="achieveList"></div>
+<button class="modal-btn" onclick="closeModal('achieveModal')">Close</button>
+</div>
+</div>
+<div class="modal" id="settingsModal">
+<div class="modal-content">
+<h2>⚙️ Settings</h2>
+<div style="margin:15px 0">
+<label>🔊 Music</label>
+<input type="range" id="musicVol" min="0" max="100" value="30" oninput="setMusic(this.value)" style="width:100%">
+</div>
+<div style="margin:15px 0">
+<label>🎵 SFX</label>
+<input type="range" id="sfxVol" min="0" max="100" value="70" oninput="setSfx(this.value)" style="width:100%">
+</div>
+<div style="margin:15px 0">
+<label>🌍 Language</label>
+<select id="langSelect" onchange="setLang(this.value)" style="padding:8px;border-radius:8px;background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.2)">
+<option value="en">English</option>
+<option value="ru">Русский</option>
+<option value="es">Español</option>
+<option value="tr">Türkçe</option>
+<option value="pt">Português</option>
+<option value="kk">Қазақша</option>
+</select>
+</div>
+<button class="modal-btn" onclick="closeModal('settingsModal')">Close</button>
+</div>
+</div>
+<div class="notification" id="notif"></div>
+<script>
+const T={
+en:{stages:["Quantum Spark","Photon","Electron","Atom","Molecule","Cell","Being","Mind","Civilization","Universe"],speech:["Tap to create energy...","I am light...","I have charge...","I am building...","I am complex...","I am alive...","I think...","We are many...","We build...","We are everything..."],tap:"TAP",ad:"📺 Ad x2",achieve:"🏆",close:"Close",settings:"Settings",music:"Music",sfx:"SFX",language:"Language",achieved:"Achievement unlocked!"},
+ru:{stages:["Квантовая искра","Фотон","Электрон","Атом","Молекула","Клетка","Существо","Разум","Цивилизация","Вселенная"],speech:["Тапай чтобы создать энергию...","Я — свет...","У меня есть заряд...","Я строюсь...","Я сложный...","Я живой...","Я мыслю...","Нас много...","Мы строим...","Мы — всё..."],tap:"ТАП",ad:"📺 Рек x2",achieve:"🏆",close:"Закрыть",settings:"Настройки",music:"Музыка",sfx:"Звуки",language:"Язык",achieved:"Достижение открыто!"},
+es:{stages:["Chispa Cuántica","Fotón","Electrón","Átomo","Molécula","Célula","Ser","Mente","Civilización","Universo"],speech:["Toca para crear energía...","Soy luz...","Tengo carga...","Estoy construyendo...","Soy complejo...","Estoy vivo...","Pienso...","Somos muchos...","Construimos...","Somos todo..."],tap:"TOCA",ad:"📺 Anu x2",achieve:"🏆",close:"Cerrar",settings:"Ajustes",music:"Música",sfx:"Sonidos",language:"Idioma",achieved:"¡Logro desbloqueado!"},
+tr:{stages:["Kuantum Kıvılcım","Foton","Elektron","Atom","Molekül","Hücre","Varlık","Zihin","Medeniyet","Evren"],speech:["Enerji yaratmak için dokun...","Ben ışığım...","Yüküm var...","İnşa ediyorum...","Karmaşığım...","Canlıyım...","Düşünüyorum...","Çoğuz...","İnşa ediyoruz...","Her şeyiz..."],tap:"DOKUN",ad:"📺 Rek x2",achieve:"🏆",close:"Kapat",settings:"Ayarlar",music:"Müzik",sfx:"Sesler",language:"Dil",achieved:"Başarım açıldı!"},
+pt:{stages:["Faísca Quântica","Fóton","Elétron","Átomo","Molécula","Célula","Ser","Mente","Civilização","Universo"],speech:["Toque para criar energia...","Sou luz...","Tenho carga...","Estou construindo...","Sou complexo...","Estou vivo...","Eu penso...","Somos muitos...","Construímos...","Somos tudo..."],tap:"TOQUE",ad:"📺 Anú x2",achieve:"🏆",close:"Fechar",settings:"Config",music:"Música",sfx:"Sons",language:"Idioma",achieved:"Conquista desbloqueada!"},
+kk:{stages:["Кванттық ұшқын","Фотон","Электрон","Атом","Молекула","Жасуша","Тіршілік","Ақыл","Өркениет","Ғалам"],speech:["Энергия yaratү үшін bas...","Men jarıqpın...","Menimde zarjad bar...","Men qurıp jatırmın...","Men kúrdelmın...","Men tırmın...","Men oylaymın...","Biz köppız...","Biz quramyz...","Biz barmyz..."],tap:"BAS",ad:"📺 Jar x2",achieve:"🏆",close:"Jabü",settings:"Baptar",music:"Muzika",sfx:"Dıbıstar",language:"Tıl",achieved:"Jetistik ashıldı!"}
+};
+const STAGES=[0,10,50,200,1000,5000,20000,100000,500000,2000000];
+const COLORS=["#00f5ff","#00ff88","#ffea00","#ff6b00","#ff006e","#b026ff","#39ff14","#00d4ff","#ff00aa","#ffffff"];
+let state={taps:0,stage:0,lang:'en',music:30,sfx:70,achievements:[]};
+let ysdk=null,player=null,audioCtx=null,musicGain=null,sfxGain=null;
+const canvas=document.getElementById('canvas');
+const ctx=canvas.getContext('2d');
+let particles=[];
+function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight}
+window.addEventListener('resize',resize);
+resize();
+class Particle{
+constructor(x,y,color){
+this.x=x;this.y=y;this.color=color;
+this.vx=(Math.random()-0.5)*4;this.vy=(Math.random()-0.5)*4;
+this.life=1;this.decay=0.02;this.size=Math.random()*3+2;
+}
+update(){
+this.x+=this.vx;this.y+=this.vy;this.life-=this.decay;
+}
+draw(){
+ctx.globalAlpha=this.life;
+ctx.fillStyle=this.color;
+ctx.beginPath();
+ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
+ctx.fill();
+}
+}
+function initAudio(){
+if(audioCtx)return;
+try{
+audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+musicGain=audioCtx.createGain();
+musicGain.gain.value=state.music/100*0.3;
+musicGain.connect(audioCtx.destination);
+sfxGain=audioCtx.createGain();
+sfxGain.gain.value=state.sfx/100;
+sfxGain.connect(audioCtx.destination);
+playMusic();
+}catch(e){}
+}
+function playMusic(){
+if(!audioCtx)return;
+const notes=[220,261.63,329.63,392,440];
+let i=0;
+function play(){
+if(!audioCtx||audioCtx.state==='closed')return;
+const osc=audioCtx.createOscillator();
+const gain=audioCtx.createGain();
+osc.type='sine';
+osc.frequency.value=notes[i%notes.length];
+const now=audioCtx.currentTime;
+gain.gain.setValueAtTime(0,now);
+gain.gain.linearRampToValueAtTime(0.1,now+0.5);
+gain.gain.linearRampToValueAtTime(0,now+3);
+osc.connect(gain);gain.connect(musicGain);
+osc.start(now);osc.stop(now+3);
+i++;
+setTimeout(play,2500);
+}
+play();
+}
+function playTap(){
+if(!audioCtx||state.sfx===0)return;
+const osc=audioCtx.createOscillator();
+const gain=audioCtx.createGain();
+osc.type='sine';
+osc.frequency.value=800+Math.random()*400;
+const now=audioCtx.currentTime;
+gain.gain.setValueAtTime(0,now);
+gain.gain.linearRampToValueAtTime(0.3,now+0.02);
+gain.gain.linearRampToValueAtTime(0,now+0.1);
+osc.connect(gain);gain.connect(sfxGain);
+osc.start(now);osc.stop(now+0.1);
+}
+function playEvolve(){
+if(!audioCtx||state.sfx===0)return;
+const notes=[523.25,659.25,783.99,1046.50];
+notes.forEach((f,i)=>{
+setTimeout(()=>{
+const osc=audioCtx.createOscillator();
+const gain=audioCtx.createGain();
+osc.type='square';
+osc.frequency.value=f;
+const now=audioCtx.currentTime;
+gain.gain.setValueAtTime(0,now);
+gain.gain.linearRampToValueAtTime(0.2,now+0.05);
+gain.gain.linearRampToValueAtTime(0,now+0.3);
+osc.connect(gain);gain.connect(sfxGain);
+osc.start(now);osc.stop(now+0.3);
+},i*100);
+});
+}
+function tap(){
+initAudio();
+state.taps++;
+playTap();
+const cx=canvas.width/2;
+const cy=canvas.height/2;
+const color=COLORS[state.stage];
+for(let i=0;i<10;i++){
+particles.push(new Particle(cx,cy,color));
+}
+checkEvolution();
+updateUI();
+save();
+}
+function checkEvolution(){
+const newStage=STAGES.findIndex(s=>state.taps<s)-1;
+if(newStage>state.stage){
+state.stage=newStage;
+playEvolve();
+showNotif(T[state.lang].achieved+' '+T[state.lang].stages[state.stage]);
+if(!state.achievements.includes(state.stage)){
+state.achievements.push(state.stage);
+}
+}
+}
+function updateUI(){
+const t=T[state.lang];
+document.getElementById('energy').textContent=state.taps;
+document.getElementById('taps').textContent=state.taps;
+document.getElementById('stage').textContent=state.stage+1;
+document.getElementById('stageName').textContent=t.stages[state.stage];
+document.getElementById('speech').textContent=t.speech[state.stage];
+const next=STAGES[state.stage+1]||STAGES[state.stage]*2;
+const prev=STAGES[state.stage];
+const progress=((state.taps-prev)/(next-prev))*100;
+document.getElementById('progress').style.width=Math.min(100,progress)+'%';
+document.body.style.background=`radial-gradient(circle at center, ${COLORS[state.stage]}22, #000)`;
+}
+function showNotif(msg){
+const n=document.getElementById('notif');
+n.textContent=msg;
+n.classList.add('show');
+setTimeout(()=>n.classList.remove('show'),2500);
+}
+function showAd(){
+if(ysdk){
+ysdk.adv.showRewardedVideo({
+callbacks:{
+onRewarded:()=>{
+state.taps+=100*(state.stage+1);
+checkEvolution();
+updateUI();
+save();
+showNotif('+'+(100*(state.stage+1))+' ⚡');
+}
+}
+});
+}else{
+state.taps+=100*(state.stage+1);
+checkEvolution();
+updateUI();
+save();
+showNotif('+'+(100*(state.stage+1))+' ⚡');
+}
+}
+function showAchievements(){
+const list=document.getElementById('achieveList');
+list.innerHTML='';
+const t=T[state.lang];
+for(let i=0;i<10;i++){
+const unlocked=state.achievements.includes(i);
+const div=document.createElement('div');
+div.style.cssText='padding:10px;margin:5px 0;background:rgba(255,255,255,0.05);border-radius:10px;opacity:'+(unlocked?1:0.3);
+div.textContent=(unlocked?'✅ ':'🔒 ')+t.stages[i];
+list.appendChild(div);
+}
+document.getElementById('achieveModal').classList.add('show');
+}
+function openSettings(){document.getElementById('settingsModal').classList.add('show')}
+function closeModal(id){document.getElementById(id).classList.remove('show')}
+function setMusic(v){state.music=parseInt(v);if(musicGain)musicGain.gain.value=v/100*0.3;save()}
+function setSfx(v){state.sfx=parseInt(v);if(sfxGain)sfxGain.gain.value=v/100;save()}
+function setLang(l){state.lang=l;updateUI();save()}
+function save(){
+if(player){
+player.setData(state);
+}else{
+localStorage.setItem('quantumSave',JSON.stringify(state));
+}
+}
+function animate(){
+ctx.fillStyle='rgba(0,0,0,0.1)';
+ctx.fillRect(0,0,canvas.width,canvas.height);
+particles=particles.filter(p=>p.life>0);
+particles.forEach(p=>{p.update();p.draw()});
+const cx=canvas.width/2;
+const cy=canvas.height/2;
+const color=COLORS[state.stage];
+const size=20+state.stage*5;
+ctx.globalAlpha=0.8;
+ctx.fillStyle=color;
+ctx.beginPath();
+ctx.arc(cx,cy,size,0,Math.PI*2);
+ctx.fill();
+ctx.globalAlpha=0.3;
+ctx.fillStyle=color;
+ctx.beginPath();
+ctx.arc(cx,cy,size*1.5,0,Math.PI*2);
+ctx.fill();
+requestAnimationFrame(animate);
+}
+animate();
+YaGames.init().then(s=>{
+ysdk=s;
+const lang=ysdk.environment.i18n.lang;
+if(T[lang])state.lang=lang;
+document.getElementById('langSelect').value=state.lang;
+ysdk.getPlayer().then(p=>{
+player=p;
+p.getData().then(d=>{
+if(d.taps!==undefined){
+state={...state,...d};
+document.getElementById('musicVol').value=state.music;
+document.getElementById('sfxVol').value=state.sfx;
+document.getElementById('langSelect').value=state.lang;
+}
+updateUI();
+});
+}).catch(()=>{
+const saved=localStorage.getItem('quantumSave');
+if(saved){
+state={...state,...JSON.parse(saved)};
+document.getElementById('musicVol').value=state.music;
+document.getElementById('sfxVol').value=state.sfx;
+document.getElementById('langSelect').value=state.lang;
+}
+updateUI();
+});
+}).catch(()=>{
+const saved=localStorage.getItem('quantumSave');
+if(saved){
+state={...state,...JSON.parse(saved)};
+document.getElementById('musicVol').value=state.music;
+document.getElementById('sfxVol').value=state.sfx;
+document.getElementById('langSelect').value=state.lang;
+}
+updateUI();
+});
+document.body.addEventListener('click',initAudio,{once:true});
+document.body.addEventListener('touchstart',initAudio,{once:true});
+window.addEventListener('blur',()=>{if(state.taps>0)save()});
+window.addEventListener('beforeunload',()=>{if(state.taps>0)save()});
+</script>
 </body>
 </html>

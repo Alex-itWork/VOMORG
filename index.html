@@ -32,7 +32,6 @@
             -webkit-user-select: none;
             -webkit-tap-highlight-color: transparent;
             position: relative;
-            transition: background 1s ease;
         }
         
         @keyframes bgGradient {
@@ -349,7 +348,6 @@
             padding: 20px;
             flex-direction: column;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3), inset 0 0 40px rgba(176, 38, 255, 0.1);
-            transition: all 0.5s;
         }
         
         /* ПЕРСОНАЖ В ПОЛНЫЙ РОСТ (SVG) */
@@ -538,7 +536,7 @@
         }
         .tap-amount { font-size: 11px; opacity: 0.9; margin-top: 3px; }
 
-        /* Панель действий - теперь внизу экрана */
+        /* Панель действий */
         .actions-panel {
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
@@ -549,7 +547,6 @@
             gap: 8px;
             z-index: 10;
             position: relative;
-            margin-top: auto; /* Прижимаем к низу */
         }
         .action-btn {
             background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
@@ -700,24 +697,13 @@
             font-size: 13px;
             border: 1px solid rgba(255,255,255,0.1);
             transition: all 0.3s;
-            cursor: pointer;
         }
         .achievement-item:not(.locked):hover {
             background: rgba(255,255,255,0.1);
             transform: translateX(5px);
-            border-color: var(--neon-blue);
         }
-        .achievement-item.locked { opacity: 0.35; cursor: not-allowed; }
+        .achievement-item.locked { opacity: 0.35; }
         .achievement-emoji { font-size: 28px; }
-        .achievement-link {
-            margin-left: auto;
-            font-size: 10px;
-            opacity: 0.6;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 100px;
-        }
         
         /* Уведомления */
         .notification {
@@ -761,50 +747,18 @@
             100% { opacity: 0; transform: translateY(-100px) scale(1.5); }
         }
         
-        /* ===== ОПТИМИЗАЦИЯ ДЛЯ ПК ===== */
+        /* Адаптивность для ТВ */
         @media (min-width: 1200px) {
             .top-bar { font-size: 20px; padding: 18px 25px; }
             .needs-bar { font-size: 16px; padding: 14px 20px; }
             .extra-stats { font-size: 16px; padding: 10px 20px; }
-            
-            /* Увеличиваем высоту сцены чтобы персонаж был виден полностью */
-            .scene-visual { 
-                min-height: 500px; 
-                max-width: 600px;
-            }
-            
-            /* Персонаж крупнее */
-            .character-container { 
-                width: 280px; 
-                height: 400px; 
-            }
-            
-            .event-text { font-size: 22px; padding: 20px; max-width: 600px; }
+            .character-container { width: 280px; height: 400px; }
+            .scene-visual { min-height: 500px; }
+            .event-text { font-size: 22px; padding: 20px; }
             .action-btn { font-size: 20px; padding: 22px 10px; }
             .request-bubble { font-size: 18px; padding: 14px 20px; }
             .tap-button { width: 180px; height: 180px; font-size: 24px; }
             .character-name { font-size: 24px; }
-            .scene-label { font-size: 18px; padding: 8px 16px; }
-            
-            /* Изменяем layout для ПК - горизонтальный */
-            .main-screen {
-                flex-direction: row;
-                justify-content: center;
-                align-items: center;
-                gap: 30px;
-                padding: 20px 40px;
-            }
-            
-            .scene-visual {
-                flex: 1;
-                max-width: 50%;
-            }
-            
-            .event-text {
-                flex: 1;
-                max-width: 45%;
-                margin: 0;
-            }
         }
         
         /* Маленькие мобилки */
@@ -895,7 +849,7 @@
     </div>
 
     <div class="main-screen" id="mainScreen" style="display: none;">
-        <div class="scene-visual" id="sceneVisual">
+        <div class="scene-visual">
             <div class="request-bubble" id="requestBubble" style="display: none;"></div>
             <div class="speech-bubble" id="speechBubble"></div>
             <div class="character-name" id="charName">Малыш</div>
@@ -1111,8 +1065,7 @@
                 modal_rent_title: "Пора съезжать!",
                 modal_rent_text: "Нужно снять квартиру. Это стоит 30 000₽.",
                 rent_accept: "Снять", rent_later: "Позже",
-                free: "Бесплатно", no_money: "Нет денег!",
-                link_copied: "🔗 Ссылка скопирована!"
+                free: "Бесплатно", no_money: "Нет денег!"
             },
             en: {
                 loading: "Loading...",
@@ -1166,21 +1119,8 @@
                 modal_rent_title: "Time to move out!",
                 modal_rent_text: "Need to rent a flat. It costs 30,000₽.",
                 rent_accept: "Rent", rent_later: "Later",
-                free: "Free", no_money: "No money!",
-                link_copied: "🔗 Link copied!"
+                free: "Free", no_money: "No money!"
             }
-        };
-
-        // --- ДИНАМИЧЕСКИЕ ФОНЫ ПО ЭТАПАМ ЖИЗНИ ---
-        const lifeBackgrounds = {
-            baby: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)', // Младенец - тёплый розовый
-            kindergarten: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)', // Садик - нежный
-            school: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', // Школа - синий
-            college: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', // Колледж - розовый
-            university: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', // ВУЗ - голубой
-            work: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', // Работа - зелёный
-            rich: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', // Богач - золотой
-            mansion: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)' // Особняк - премиум
         };
 
         // --- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ---
@@ -1196,10 +1136,852 @@
         let musicGain = null;
         let settings = { musicVolume: 30, vibration: true, language: 'ru' };
         let gameStarted = false;
-        let currentLifeStage = 'baby';
 
         // --- АУДИО ---
         function initAudio() {
             if (audioCtx) return;
             try {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                musicGain = audioCtx.createGain();
+                musicGain.gain.value = settings.musicVolume / 100 * 0.3;
+                musicGain.connect(audioCtx.destination);
+                playAmbientMusic();
+            } catch(e) { console.log('Audio not supported'); }
+        }
+        
+        function playAmbientMusic() {
+            if (!audioCtx) return;
+            const notes = [220, 261.63, 329.63, 392];
+            let noteIndex = 0;
+            function playNote() {
+                if (!audioCtx || audioCtx.state === 'closed') return;
+                const osc = audioCtx.createOscillator();
+                const noteGain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = notes[noteIndex % notes.length];
+                const now = audioCtx.currentTime;
+                noteGain.gain.setValueAtTime(0, now);
+                noteGain.gain.linearRampToValueAtTime(0.15, now + 0.5);
+                noteGain.gain.linearRampToValueAtTime(0, now + 3);
+                osc.connect(noteGain);
+                noteGain.connect(musicGain);
+                osc.start(now);
+                osc.stop(now + 3);
+                noteIndex++;
+                setTimeout(playNote, 2500);
+            }
+            playNote();
+        }
+        
+        function setMusicVolume(val) {
+            settings.musicVolume = parseInt(val);
+            if (musicGain) musicGain.gain.value = settings.musicVolume / 100 * 0.3;
+            saveSettings();
+        }
+        
+        function toggleVibration() {
+            settings.vibration = !settings.vibration;
+            document.getElementById('vibrationToggle').classList.toggle('on');
+            saveSettings();
+        }
+        
+        function vibrate(ms = 50) {
+            if (settings.vibration && navigator.vibrate) navigator.vibrate(ms);
+        }
+        
+        function saveSettings() {
+            localStorage.setItem('lifeSimSettings', JSON.stringify(settings));
+        }
+        
+        function loadSettings() {
+            const s = localStorage.getItem('lifeSimSettings');
+            if (s) settings = { ...settings, ...JSON.parse(s) };
+            document.getElementById('musicVolume').value = settings.musicVolume;
+            document.getElementById('languageSelect').value = settings.language;
+            if (!settings.vibration) document.getElementById('vibrationToggle').classList.remove('on');
+        }
+        
+        function openSettings() {
+            document.getElementById('settingsModal').classList.add('show');
+        }
+        
+        function changeLanguage(lang) {
+            settings.language = lang;
+            currentLang = lang;
+            applyLanguage(lang);
+            saveSettings();
+            updateUI();
+        }
+
+        // --- ЛОКАЛИЗАЦИЯ ---
+        function getSafeLang(lang) {
+            return ['ru', 'en'].includes(lang) ? lang : 'ru';
+        }
+
+        function applyLanguage(lang) {
+            currentLang = getSafeLang(lang);
+            const t = translations[currentLang];
+            document.getElementById('loadingText').innerText = t.loading;
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (t[key]) el.innerText = t[key];
+            });
+        }
+
+        // --- СОЗДАНИЕ ПЕРСОНАЖА ---
+        function selectGender(gender) {
+            selectedGender = gender;
+            document.querySelectorAll('.gender-btn').forEach(btn => btn.classList.remove('selected'));
+            document.querySelector(`[data-gender="${gender}"]`).classList.add('selected');
+            document.getElementById('startBtn').disabled = false;
+        }
+
+        function startGame() {
+            const name = document.getElementById('nameInput').value.trim() || (currentLang === 'ru' ? 'Малыш' : 'Baby');
+            gameState.name = name;
+            gameState.gender = selectedGender;
+            gameState.createdAt = Date.now();
+            
+            document.getElementById('characterCreation').style.display = 'none';
+            showGameUI();
+            game.saveProgress();
+            updateUI();
+            updateCharacterVisual();
+            startRequestSystem();
+            startLoveSystem();
+            unlockAchievement('ach_first_feed');
+            
+            document.body.addEventListener('click', initAudio, { once: true });
+            document.body.addEventListener('touchstart', initAudio, { once: true });
+            
+            gameStarted = true;
+        }
+
+        function showGameUI() {
+            document.getElementById('gameUI').style.display = 'grid';
+            document.getElementById('needsBar').style.display = 'grid';
+            document.getElementById('extraStats').style.display = 'grid';
+            document.getElementById('mainScreen').style.display = 'flex';
+            document.getElementById('actionsPanel').style.display = 'grid';
+        }
+
+        // --- SDK ---
+        YaGames.init().then(ysdkInstance => {
+            ysdk = ysdkInstance;
+            const detectedLang = ysdk.environment.i18n.lang;
+            applyLanguage(detectedLang);
+            loadSettings();
+
+            document.getElementById('loadingScreen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('loadingScreen').style.display = 'none';
+                ysdk.getPlayer().then(_player => {
+                    player = _player;
+                    player.getData().then(data => {
+                        if (data.name) {
+                            gameState = { ...defaultState, ...data };
+                            showGameUI();
+                            checkLevelUp();
+                            updateUI();
+                            updateCharacterVisual();
+                            startRequestSystem();
+                            startLoveSystem();
+                            gameStarted = true;
+                            document.body.addEventListener('click', initAudio, { once: true });
+                        } else {
+                            document.getElementById('characterCreation').style.display = 'flex';
+                        }
+                    });
+                }).catch(() => {
+                    const saved = localStorage.getItem('lifeSimSave');
+                    if (saved) {
+                        gameState = { ...defaultState, ...JSON.parse(saved) };
+                        showGameUI();
+                        checkLevelUp();
+                        updateUI();
+                        updateCharacterVisual();
+                        startRequestSystem();
+                        startLoveSystem();
+                        gameStarted = true;
+                        checkAbsence();
+                    } else {
+                        document.getElementById('characterCreation').style.display = 'flex';
+                    }
+                    document.body.addEventListener('click', initAudio, { once: true });
+                });
+            }, 300);
+        }).catch(e => {
+            console.error('SDK init failed', e);
+            applyLanguage('ru');
+            loadSettings();
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('characterCreation').style.display = 'flex';
+        });
+
+        // --- СОСТОЯНИЕ ИГРЫ ---
+        const defaultState = {
+            name: '', gender: null,
+            ageYears: 0, ageMonths: 0,
+            money: 0, happiness: 80, bond: 0,
+            iq: 50, strength: 10, stamina: 10, mind: 10,
+            level: 1, totalEarned: 0,
+            hunger: 100, thirst: 100, sleep: 100, hygiene: 100, fun: 100,
+            education: 'none',
+            educationYearsLeft: 0,
+            career: 'none',
+            careerYears: 0,
+            housing: 'parents',
+            phoneModel: 0,
+            achievements: [],
+            pathChosen: false,
+            rentedFlat: false,
+            hasLicense: false,
+            hasDiploma: false,
+            createdAt: 0,
+            lastSeen: 0,
+            totalTaps: 0,
+            totalActions: 0
+        };
+        let gameState = { ...defaultState };
+
+        // --- ДОСТИЖЕНИЯ ---
+        const achievementsList = [
+            { id: 'ach_first_feed', emoji: '🍼' },
+            { id: 'ach_kindergarten', emoji: '🏫' },
+            { id: 'ach_school', emoji: '📚' },
+            { id: 'ach_first_phone', emoji: '📱' },
+            { id: 'ach_graduation', emoji: '🎓' },
+            { id: 'ach_college', emoji: '🎒' },
+            { id: 'ach_university', emoji: '🏛️' },
+            { id: 'ach_first_job', emoji: '💼' },
+            { id: 'ach_first_flat', emoji: '🏠' },
+            { id: 'ach_license', emoji: '🚗' },
+            { id: 'ach_diploma', emoji: '📜' },
+            { id: 'ach_promotion', emoji: '📈' },
+            { id: 'ach_millionaire', emoji: '💎' },
+            { id: 'ach_bond_100', emoji: '💖' }
+        ];
+
+        // --- ТЕЛЕФОНЫ ---
+        const phoneModels = [
+            { name: 'Кнопочный', price: 1000 },
+            { name: 'Простой смартфон', price: 5000 },
+            { name: 'Средний смартфон', price: 15000 },
+            { name: 'Флагман', price: 30000 },
+            { name: 'Премиум', price: 60000 },
+            { name: 'Pro', price: 100000 },
+            { name: 'Pro Max', price: 150000 },
+            { name: 'Ultra', price: 250000 },
+            { name: 'Gold Edition', price: 500000 },
+            { name: 'Diamond', price: 1000000 }
+        ];
+
+        function getXpForNextLevel(lvl) {
+            if (lvl >= 1000) return Infinity;
+            return Math.floor(100 * Math.pow(1.08, lvl));
+        }
+
+        // --- ОБНОВЛЕНИЕ ВИЗУАЛА ПЕРСОНАЖА ---
+        function updateCharacterVisual() {
+            const age = gameState.ageYears;
+            const g = gameState.gender;
+            const hair = document.getElementById('charHair');
+            const body = document.getElementById('charBody');
+            const mouth = document.getElementById('charMouth');
+            
+            // Волосы меняются с полом и возрастом
+            if (g === 'female') {
+                hair.setAttribute('d', 'M 45 55 Q 45 10 90 10 Q 135 10 135 55 Q 135 25 90 20 Q 45 25 45 55 Z');
+                hair.setAttribute('fill', '#8b4513');
+            } else if (g === 'humanoid') {
+                hair.setAttribute('d', 'M 55 40 L 60 20 L 70 30 L 80 15 L 90 30 L 100 15 L 110 30 L 120 20 L 125 40 Z');
+                hair.setAttribute('fill', '#00f5ff');
+            } else {
+                hair.setAttribute('d', 'M 50 50 Q 50 15 90 15 Q 130 15 130 50 Q 130 35 90 30 Q 50 35 50 50 Z');
+                hair.setAttribute('fill', '#4a2c1a');
+            }
+            
+            // Младенец — без волос
+            if (age < 1) {
+                hair.setAttribute('d', 'M 55 45 Q 90 30 125 45');
+                hair.setAttribute('fill', 'none');
+            }
+            
+            // Тело меняет цвет с карьерой/возрастом
+            let bodyColor1 = '#4a90e2', bodyColor2 = '#357abd';
+            if (age < 2) { bodyColor1 = '#ffb6c1'; bodyColor2 = '#ff69b4'; } // Младенец — розовый
+            else if (age < 7) { bodyColor1 = '#ffd700'; bodyColor2 = '#ffa500'; } // Малыш — жёлтый
+            else if (gameState.education === 'school') { bodyColor1 = '#3498db'; bodyColor2 = '#2980b9'; } // Школьная форма
+            else if (gameState.education === 'college' || gameState.education === 'university') { bodyColor1 = '#9b59b6'; bodyColor2 = '#8e44ad'; } // Студент
+            else if (gameState.career === 'worker' || gameState.career === 'specialist') { bodyColor1 = '#27ae60'; bodyColor2 = '#229954'; }
+            else if (gameState.career === 'manager') { bodyColor1 = '#2c3e50'; bodyColor2 = '#34495e'; }
+            else if (gameState.career === 'director' || gameState.career === 'ceo') { bodyColor1 = '#1a1a1a'; bodyColor2 = '#333'; }
+            
+            const grad = document.getElementById('bodyGradient');
+            grad.children[0].setAttribute('stop-color', bodyColor1);
+            grad.children[1].setAttribute('stop-color', bodyColor2);
+            
+            // Рот меняется с настроением
+            if (gameState.happiness > 70) {
+                mouth.setAttribute('d', 'M 75 75 Q 90 85 105 75'); // Улыбка
+            } else if (gameState.happiness > 40) {
+                mouth.setAttribute('d', 'M 75 78 L 105 78'); // Нейтральный
+            } else {
+                mouth.setAttribute('d', 'M 75 82 Q 90 72 105 82'); // Грусть
+            }
+        }
+
+        function getLifeStage() {
+            const age = gameState.ageYears;
+            const t = translations[currentLang];
+            if (age < 2) return t.stage_baby;
+            if (age < 7) return t.stage_toddler;
+            if (age < 15) return t.stage_child;
+            if (age < 18) return t.stage_teen;
+            if (gameState.education === 'college' || gameState.education === 'university') return t.stage_student;
+            if (gameState.money >= 10000000) return t.stage_millionaire;
+            if (gameState.money >= 1000000) return t.stage_rich;
+            return t.stage_adult;
+        }
+
+        function getScene() {
+            const t = translations[currentLang];
+            if (gameState.housing === 'mansion') return t.scene_mansion;
+            if (gameState.housing === 'own') return t.scene_own_home;
+            if (gameState.housing === 'rented') return t.scene_own_home;
+            if (gameState.education === 'kindergarten') return t.scene_kindergarten;
+            if (gameState.education === 'school') return t.scene_school;
+            if (gameState.education === 'college') return t.scene_college;
+            if (gameState.education === 'university') return t.scene_university;
+            if (gameState.career !== 'none') return t.scene_work;
+            return t.scene_home;
+        }
+
+        // --- СИСТЕМА ПРОСЬБ ---
+        function startRequestSystem() {
+            if (requestTimer) clearInterval(requestTimer);
+            let interval = 2000;
+            let elapsed = 0;
+            
+            requestTimer = setInterval(() => {
+                elapsed += interval;
+                if (elapsed > 30000) interval = 5000;
+                if (elapsed > 120000) interval = 10000;
+                if (elapsed > 300000) interval = 20000;
+                if (gameState.ageYears > 5) interval *= 1.5;
+                if (gameState.ageYears > 15) interval *= 2;
+                
+                if (Math.random() < 0.7 && !activeRequest) generateRequest();
+            }, interval);
+        }
+
+        function generateRequest() {
+            const t = translations[currentLang];
+            const age = gameState.ageYears;
+            let requests = [];
+            
+            if (age < 1) {
+                requests.push({ type: 'eat', text: t.req_hungry });
+                requests.push({ type: 'eat', text: t.req_hungry2 });
+                if (gameState.hygiene < 80) requests.push({ type: 'clean', text: t.req_poop });
+            } else {
+                if (gameState.hunger < 70) requests.push({ type: 'eat', text: t.req_hungry });
+                if (gameState.thirst < 70) requests.push({ type: 'drink', text: t.req_thirsty });
+                if (gameState.hygiene < 70) requests.push({ type: 'clean', text: t.req_dirty });
+                if (gameState.sleep < 70) requests.push({ type: 'sleep', text: t.req_tired });
+                if (gameState.fun < 70) requests.push({ type: 'play', text: t.req_bored });
+                if (age >= 2 && age < 15 && gameState.fun < 80) requests.push({ type: 'walk', text: t.req_walk });
+            }
+            
+            if (requests.length === 0) requests.push({ type: 'eat', text: t.req_hungry });
+            
+            activeRequest = requests[Math.floor(Math.random() * requests.length)];
+            const bubble = document.getElementById('requestBubble');
+            bubble.innerText = activeRequest.text;
+            bubble.style.display = 'block';
+            vibrate(30);
+        }
+
+        function fulfillRequest(type) {
+            if (activeRequest && activeRequest.type === type) {
+                activeRequest = null;
+                document.getElementById('requestBubble').style.display = 'none';
+                gameState.happiness = Math.min(100, gameState.happiness + 5);
+                gameState.bond = Math.min(100, gameState.bond + 2);
+                if (gameState.bond >= 100) unlockAchievement('ach_bond_100');
+            }
+        }
+
+        // --- СИСТЕМА ПРИВЯЗАННОСТИ ---
+        function startLoveSystem() {
+            if (loveTimer) clearInterval(loveTimer);
+            loveTimer = setInterval(() => {
+                const timeSinceInteraction = Date.now() - lastInteractionTime;
+                const t = translations[currentLang];
+                
+                if (timeSinceInteraction > 15000 && Math.random() < 0.3) showSpeechBubble(t.love_you);
+                if (timeSinceInteraction > 30000 && Math.random() < 0.4) showSpeechBubble(t.you_best);
+            }, 10000);
+        }
+        
+        function checkAbsence() {
+            if (!gameState.lastSeen) return;
+            const timeAway = Date.now() - gameState.lastSeen;
+            const t = translations[currentLang];
+            
+            if (timeAway > 3600000) {
+                setTimeout(() => {
+                    showSpeechBubble(t.missed_you);
+                    showNotification(t.missed_you, 'love');
+                    vibrate([100, 50, 100]);
+                }, 1000);
+                setTimeout(() => showSpeechBubble(t.thanks_come), 3500);
+            }
+        }
+        
+        function showSpeechBubble(text) {
+            const bubble = document.getElementById('speechBubble');
+            bubble.innerText = text;
+            bubble.classList.remove('show');
+            void bubble.offsetWidth; // reflow
+            bubble.classList.add('show');
+            setTimeout(() => bubble.classList.remove('show'), 3000);
+        }
+
+        // --- ОСНОВНАЯ ЛОГИКА ---
+        const game = {
+            tap: function() {
+                if (gameState.ageYears < 2) return;
+                const earn = Math.floor(50 * (1 + gameState.level * 0.1));
+                gameState.money += earn;
+                gameState.totalEarned += earn;
+                gameState.totalTaps++;
+                gameState.fun = Math.min(100, gameState.fun + 2);
+                gameState.bond = Math.min(100, gameState.bond + 1);
+                
+                lastInteractionTime = Date.now();
+                vibrate(30);
+                
+                const tapBtn = document.getElementById('tapButton');
+                const rect = tapBtn.getBoundingClientRect();
+                const floatNum = document.createElement('div');
+                floatNum.className = 'floating-number';
+                floatNum.innerText = `+${earn}`;
+                floatNum.style.left = (rect.left + rect.width / 2 - 20) + 'px';
+                floatNum.style.top = (rect.top) + 'px';
+                document.body.appendChild(floatNum);
+                setTimeout(() => floatNum.remove(), 1000);
+                
+                checkLevelUp();
+                this.saveProgress();
+                updateUI();
+            },
+            
+            action: function(type) {
+                const age = gameState.ageYears;
+                const t = translations[currentLang];
+                lastInteractionTime = Date.now();
+                vibrate(20);
+                
+                switch(type) {
+                    case 'eat':
+                        const eatCost = age < 3 ? 0 : (age < 10 ? 100 : 200);
+                        if (gameState.money >= eatCost || age < 3) {
+                            if (age >= 3) gameState.money -= eatCost;
+                            gameState.hunger = Math.min(100, gameState.hunger + 40);
+                            gameState.happiness += 5;
+                            gameState.bond = Math.min(100, gameState.bond + 3);
+                            fulfillRequest('eat');
+                            showSpeechBubble(t.thanks_feed);
+                            setEvent(t.thanks_feed);
+                        } else {
+                            showNotification(t.no_money, 'warning');
+                            return;
+                        }
+                        break;
+                    case 'drink':
+                        const drinkCost = age < 3 ? 0 : 50;
+                        if (gameState.money >= drinkCost || age < 3) {
+                            if (age >= 3) gameState.money -= drinkCost;
+                            gameState.thirst = Math.min(100, gameState.thirst + 50);
+                            fulfillRequest('drink');
+                            showSpeechBubble(t.thanks_drink);
+                            setEvent(t.thanks_drink);
+                        }
+                        break;
+                    case 'sleep':
+                        gameState.sleep = Math.min(100, gameState.sleep + 60);
+                        gameState.happiness += 5;
+                        fulfillRequest('sleep');
+                        showSpeechBubble(t.thanks_sleep);
+                        setEvent(t.thanks_sleep);
+                        break;
+                    case 'clean':
+                        gameState.hygiene = Math.min(100, gameState.hygiene + 70);
+                        fulfillRequest('clean');
+                        if (activeRequest && activeRequest.type === 'clean' && activeRequest.text.includes('💩')) {
+                            showSpeechBubble(t.thanks_wipe);
+                            showNotification(t.thanks_wipe, 'success');
+                        } else {
+                            showSpeechBubble(t.thanks_clean);
+                        }
+                        setEvent(t.thanks_clean);
+                        break;
+                    case 'play':
+                        if (age >= 3 && gameState.money < 50) {
+                            showNotification(t.no_money, 'warning');
+                            return;
+                        }
+                        if (age >= 3) gameState.money -= 50;
+                        gameState.fun = Math.min(100, gameState.fun + 40);
+                        gameState.happiness += 10;
+                        gameState.bond = Math.min(100, gameState.bond + 5);
+                        fulfillRequest('play');
+                        fulfillRequest('walk');
+                        showSpeechBubble(t.thanks_play);
+                        setEvent(t.thanks_play);
+                        gameState.mind = Math.min(100, gameState.mind + 1);
+                        break;
+                }
+                
+                gameState.totalActions++;
+                if (age < 18 && gameState.money < 0) gameState.money = 0;
+                
+                updateCharacterVisual();
+                checkLevelUp();
+                this.saveProgress();
+                updateUI();
+            },
+
+            nextMonth: function() {
+                gameState.ageMonths++;
+                lastInteractionTime = Date.now();
+                vibrate(20);
+                
+                const ageFactor = Math.max(0.3, 1 - gameState.ageYears * 0.02);
+                gameState.hunger = Math.max(0, gameState.hunger - 20 * ageFactor);
+                gameState.thirst = Math.max(0, gameState.thirst - 25 * ageFactor);
+                gameState.sleep = Math.max(0, gameState.sleep - 15 * ageFactor);
+                gameState.hygiene = Math.max(0, gameState.hygiene - 15 * ageFactor);
+                gameState.fun = Math.max(0, gameState.fun - 20 * ageFactor);
+                
+                if (gameState.ageMonths >= 12) {
+                    gameState.ageMonths = 0;
+                    gameState.ageYears++;
+                    this.onNewYear();
+                }
+                
+                if (gameState.career !== 'none') {
+                    const salary = this.getSalary();
+                    gameState.money += salary;
+                    gameState.totalEarned += salary;
+                }
+                
+                if (gameState.ageYears >= 18) {
+                    let expenses = 5000;
+                    if (gameState.housing === 'rented') expenses += 15000;
+                    if (gameState.money >= expenses) gameState.money -= expenses;
+                    else gameState.happiness -= 10;
+                }
+                
+                if (gameState.ageYears >= 10 && gameState.ageYears <= 19) {
+                    const phoneIdx = gameState.ageYears - 10;
+                    if (phoneIdx >= gameState.phoneModel) {
+                        const phone = phoneModels[phoneIdx];
+                        if (gameState.money >= phone.price) {
+                            gameState.money -= phone.price;
+                            gameState.phoneModel = phoneIdx + 1;
+                            if (phoneIdx === 0) unlockAchievement('ach_first_phone');
+                            setEvent(currentLang === 'ru' ? `📱 Новый телефон: ${phone.name}!` : `📱 New phone: ${phone.name}!`);
+                        }
+                    }
+                }
+                
+                if (gameState.educationYearsLeft > 0) {
+                    gameState.educationYearsLeft--;
+                    if (gameState.educationYearsLeft === 0) this.onEducationEnd();
+                }
+                
+                if (gameState.ageYears === 2 && gameState.education === 'none') {
+                    gameState.education = 'kindergarten';
+                    unlockAchievement('ach_kindergarten');
+                    setEvent(currentLang === 'ru' ? '🏫 Первый день в садике!' : '🏫 First day at kindergarten!');
+                }
+                if (gameState.ageYears === 7 && gameState.education === 'kindergarten') {
+                    gameState.education = 'school';
+                    unlockAchievement('ach_school');
+                    setEvent(currentLang === 'ru' ? '📚 Первый класс!' : '📚 First grade!');
+                }
+                if (gameState.ageYears === 15 && !gameState.pathChosen) this.showPathChoice();
+                if (gameState.ageYears === 18 && gameState.education === 'school') unlockAchievement('ach_graduation');
+                
+                if (gameState.hunger < 30 || gameState.thirst < 30 || gameState.hygiene < 30) gameState.happiness -= 5;
+                
+                updateCharacterVisual();
+                checkLevelUp();
+                this.saveProgress();
+                updateUI();
+            },
+            
+            onNewYear: function() {
+                const age = gameState.ageYears;
+                if (age < 18) gameState.money += 1000 + age * 200;
+                if (gameState.education !== 'none') {
+                    gameState.iq = Math.min(200, gameState.iq + 5);
+                    gameState.mind = Math.min(100, gameState.mind + 3);
+                }
+                gameState.strength = Math.min(100, gameState.strength + 2);
+                gameState.stamina = Math.min(100, gameState.stamina + 2);
+            },
+            
+            onEducationEnd: function() {
+                if (gameState.education === 'college') {
+                    unlockAchievement('ach_diploma');
+                    gameState.hasDiploma = true;
+                    gameState.career = 'worker';
+                    gameState.iq += 10;
+                    setEvent(currentLang === 'ru' ? '🎓 Колледж окончен!' : '🎓 College done!');
+                } else if (gameState.education === 'university') {
+                    unlockAchievement('ach_diploma');
+                    gameState.hasDiploma = true;
+                    gameState.career = 'specialist';
+                    gameState.iq += 20;
+                    setEvent(currentLang === 'ru' ? '🎓 ВУЗ окончен!' : '🎓 Uni done!');
+                }
+            },
+            
+            getSalary: function() {
+                const base = {
+                    'worker': 30000, 'specialist': 70000, 'manager': 150000,
+                    'director': 400000, 'ceo': 1000000
+                };
+                return base[gameState.career] || 0;
+            },
+            
+            showPathChoice: function() {
+                const t = translations[currentLang];
+                document.getElementById('modalTitle').innerText = t.modal_path_title;
+                document.getElementById('modalText').innerText = t.modal_path_text;
+                document.getElementById('modalButtons').innerHTML = `
+                    <button class="modal-btn" onclick="game.choosePath('college')">${t.path_college}</button>
+                    <button class="modal-btn" onclick="game.choosePath('university')">${t.path_university}</button>
+                    <button class="modal-btn" onclick="game.choosePath('work')">${t.path_work}</button>
+                `;
+                document.getElementById('pathModal').classList.add('show');
+            },
+            
+            choosePath: function(path) {
+                gameState.pathChosen = true;
+                document.getElementById('pathModal').classList.remove('show');
+                
+                if (path === 'college') {
+                    gameState.education = 'college';
+                    gameState.educationYearsLeft = 3;
+                    unlockAchievement('ach_college');
+                } else if (path === 'university') {
+                    gameState.education = 'university';
+                    gameState.educationYearsLeft = 5;
+                    unlockAchievement('ach_university');
+                } else {
+                    gameState.career = 'worker';
+                    unlockAchievement('ach_first_job');
+                    this.showRentOffer();
+                }
+            },
+            
+            showRentOffer: function() {
+                const t = translations[currentLang];
+                document.getElementById('modalTitle').innerText = t.modal_rent_title;
+                document.getElementById('modalText').innerText = t.modal_rent_text;
+                document.getElementById('modalButtons').innerHTML = `
+                    <button class="modal-btn" onclick="game.rentFlat()">${t.rent_accept}</button>
+                    <button class="modal-btn" onclick="closeModal('pathModal')">${t.rent_later}</button>
+                `;
+                document.getElementById('pathModal').classList.add('show');
+            },
+            
+            rentFlat: function() {
+                if (gameState.money >= 30000) {
+                    gameState.money -= 30000;
+                    gameState.housing = 'rented';
+                    gameState.rentedFlat = true;
+                    unlockAchievement('ach_first_flat');
+                }
+                closeModal('pathModal');
+                updateUI();
+            },
+            
+            showAchievements: function() {
+                const list = document.getElementById('achievementsList');
+                list.innerHTML = '';
+                const t = translations[currentLang];
+                achievementsList.forEach(ach => {
+                    const unlocked = gameState.achievements.includes(ach.id);
+                    const name = t[ach.id] || ach.id;
+                    const div = document.createElement('div');
+                    div.className = 'achievement-item' + (unlocked ? '' : ' locked');
+                    div.innerHTML = `<span class="achievement-emoji">${ach.emoji}</span><span>${unlocked ? name : '???'}</span>`;
+                    list.appendChild(div);
+                });
+                document.getElementById('achieveModal').classList.add('show');
+            },
+            
+            shareAchievements: function() {
+                const count = gameState.achievements.length;
+                const text = currentLang === 'ru'
+                    ? `🎮 Life Simulator\n👤 ${gameState.name}\n🎂 Возраст: ${gameState.ageYears} лет ${gameState.ageMonths} мес\n💰 Капитал: ${gameState.money.toLocaleString()} ₽\n🏆 Наград: ${count}/${achievementsList.length}\n💖 Привязанность: ${gameState.bond}%`
+                    : `🎮 Life Simulator\n👤 ${gameState.name}\n🎂 Age: ${gameState.ageYears}y ${gameState.ageMonths}m\n💰 Capital: ${gameState.money.toLocaleString()} ₽\n🏆 Awards: ${count}/${achievementsList.length}\n💖 Bond: ${gameState.bond}%`;
+                
+                if (navigator.share) {
+                    navigator.share({ title: 'Life Simulator', text: text }).catch(() => {});
+                } else {
+                    navigator.clipboard.writeText(text).then(() => {
+                        showNotification(currentLang === 'ru' ? '📋 Скопировано!' : '📋 Copied!', 'success');
+                    });
+                }
+            },
+
+            saveProgress: function() {
+                gameState.lastSeen = Date.now();
+                if (player) {
+                    player.setData(gameState);
+                } else {
+                    localStorage.setItem('lifeSimSave', JSON.stringify(gameState));
+                }
+            }
+        };
+
+        function unlockAchievement(id) {
+            if (!gameState.achievements.includes(id)) {
+                gameState.achievements.push(id);
+                const ach = achievementsList.find(a => a.id === id);
+                if (ach) {
+                    const t = translations[currentLang];
+                    showNotification(`🏆 ${t[id] || id}`, 'success');
+                    vibrate([50, 30, 50]);
+                }
+            }
+        }
+
+        function checkLevelUp() {
+            let nextLevelXp = getXpForNextLevel(gameState.level);
+            while (gameState.totalEarned >= nextLevelXp && gameState.level < 1000) {
+                gameState.level++;
+                gameState.happiness = Math.min(100, gameState.happiness + 2);
+                nextLevelXp = getXpForNextLevel(gameState.level);
+            }
+            
+            if (gameState.career === 'manager' && !gameState.achievements.includes('ach_promotion')) unlockAchievement('ach_promotion');
+            if (gameState.money >= 1000000 && !gameState.achievements.includes('ach_millionaire')) {
+                unlockAchievement('ach_millionaire');
+                gameState.housing = 'mansion';
+            }
+            
+            if (gameState.career !== 'none' && gameState.housing === 'parents' && gameState.ageYears >= 20) {
+                if (gameState.money >= 500000 && !gameState.rentedFlat) {
+                    gameState.money -= 500000;
+                    gameState.housing = 'own';
+                    unlockAchievement('ach_first_flat');
+                }
+            }
+            
+            if (gameState.ageYears === 18 && !gameState.hasLicense && gameState.money >= 30000) {
+                gameState.money -= 30000;
+                gameState.hasLicense = true;
+                unlockAchievement('ach_license');
+            }
+            
+            if (gameState.career === 'worker' && gameState.careerYears >= 3) { gameState.career = 'specialist'; gameState.careerYears = 0; }
+            if (gameState.career === 'specialist' && gameState.careerYears >= 5) { gameState.career = 'manager'; gameState.careerYears = 0; unlockAchievement('ach_promotion'); }
+            if (gameState.career === 'manager' && gameState.careerYears >= 7) { gameState.career = 'director'; gameState.careerYears = 0; }
+            if (gameState.career === 'director' && gameState.careerYears >= 10) { gameState.career = 'ceo'; gameState.careerYears = 0; }
+            if (gameState.career !== 'none') gameState.careerYears++;
+        }
+
+        function setEvent(text) {
+            document.getElementById('eventText').innerText = text;
+        }
+
+        function updateUI() {
+            const locale = currentLang === 'ru' ? 'ru-RU' : 'en-US';
+            const t = translations[currentLang];
+            
+            const ageEl = document.getElementById('age');
+            if (gameState.ageYears < 1) {
+                ageEl.innerText = `${gameState.ageMonths} ${t.months}`;
+            } else {
+                ageEl.innerText = `${gameState.ageYears} ${t.years}`;
+            }
+            
+            document.getElementById('money').innerText = Math.floor(gameState.money).toLocaleString(locale);
+            document.getElementById('happiness').innerText = gameState.happiness;
+            document.getElementById('bond').innerText = gameState.bond;
+            document.getElementById('level').innerText = gameState.level;
+            document.getElementById('levelTitle').innerText = getLifeStage();
+
+            const currentLevelXp = gameState.level === 1 ? 0 : getXpForNextLevel(gameState.level - 1);
+            const nextLevelXp = getXpForNextLevel(gameState.level);
+            const xpInRange = gameState.totalEarned - currentLevelXp;
+            const xpNeededTotal = nextLevelXp - currentLevelXp;
+            const percent = Math.min(100, Math.max(0, (xpInRange / xpNeededTotal) * 100));
+            document.getElementById('xpBar').style.width = percent + '%';
+
+            document.getElementById('iqStat').innerText = gameState.iq;
+            document.getElementById('strStat').innerText = gameState.strength;
+            document.getElementById('staStat').innerText = gameState.stamina;
+            document.getElementById('mindStat').innerText = gameState.mind;
+
+            document.getElementById('sceneLabel').innerText = getScene();
+            document.getElementById('charName').innerText = gameState.name;
+
+            document.getElementById('hungerVal').innerText = Math.floor(gameState.hunger);
+            document.getElementById('hungerBar').style.width = gameState.hunger + '%';
+            document.getElementById('thirstVal').innerText = Math.floor(gameState.thirst);
+            document.getElementById('thirstBar').style.width = gameState.thirst + '%';
+            document.getElementById('sleepVal').innerText = Math.floor(gameState.sleep);
+            document.getElementById('sleepBar').style.width = gameState.sleep + '%';
+            document.getElementById('hygieneVal').innerText = Math.floor(gameState.hygiene);
+            document.getElementById('hygieneBar').style.width = gameState.hygiene + '%';
+            document.getElementById('funVal').innerText = Math.floor(gameState.fun);
+            document.getElementById('funBar').style.width = gameState.fun + '%';
+            
+            const tapBtn = document.getElementById('tapButton');
+            if (gameState.ageYears >= 2) {
+                tapBtn.classList.add('show');
+                const tapEarn = Math.floor(50 * (1 + gameState.level * 0.1));
+                document.getElementById('tapAmount').innerText = `+${tapEarn.toLocaleString(locale)} ₽`;
+            } else {
+                tapBtn.classList.remove('show');
+            }
+            
+            const age = gameState.ageYears;
+            const eatCost = age < 3 ? 0 : (age < 10 ? 100 : 200);
+            document.getElementById('eatCost').innerText = eatCost === 0 ? t.free : `-${eatCost}₽`;
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('show');
+        }
+
+        function showNotification(message, type = 'info') {
+            const notif = document.getElementById('notification');
+            notif.innerText = message;
+            notif.className = 'notification show ' + type;
+            setTimeout(() => notif.classList.remove('show'), 2500);
+        }
+
+        window.addEventListener('blur', () => {
+            if (gameStarted) game.saveProgress();
+            if (requestTimer) clearInterval(requestTimer);
+            if (loveTimer) clearInterval(loveTimer);
+        });
+        window.addEventListener('focus', () => {
+            if (gameStarted) {
+                startRequestSystem();
+                startLoveSystem();
+            }
+        });
+        window.addEventListener('beforeunload', () => { if (gameStarted) game.saveProgress(); });
+    </script>
+</body>
+</html>
